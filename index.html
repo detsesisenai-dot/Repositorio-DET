@@ -1,446 +1,472 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { 
-  Plus, 
-  ExternalLink, 
-  Search, 
-  BookOpen, 
-  Briefcase, 
-  Lightbulb, 
-  Building2, 
-  Target, 
-  X, 
-  UploadCloud, 
-  Image as ImageIcon,
-  Edit2,
-  Trash2
-} from 'lucide-react';
-
-// Constantes de Categorias
-const CATEGORIES = [
-  { id: 'ed-basica', name: 'Educação Básica', icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
-  { id: 'ed-profissional', name: 'Educação Profissional', icon: Briefcase, color: 'text-red-600', bg: 'bg-red-50' },
-  { id: 'sti', name: 'Serviços de Tecnologia e Inovação', icon: Lightbulb, color: 'text-amber-500', bg: 'bg-amber-50' },
-  { id: 'institucional', name: 'Institucional', icon: Building2, color: 'text-slate-700', bg: 'bg-slate-100' },
-  { id: 'estrategicos', name: 'Estratégicos', icon: Target, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-];
-
-// Dados Iniciais Simulados
-const INITIAL_LINKS = [
-  {
-    id: 1,
-    title: 'Agente IA - Tutor de Matemática',
-    url: 'https://www.sesi.org.br',
-    image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=400',
-    categoryId: 'ed-basica',
-    type: 'Assistente'
-  },
-  {
-    id: 2,
-    title: 'Simulador de Indústria 4.0',
-    url: 'https://www.portaldaindustria.com.br/senai/',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400',
-    categoryId: 'ed-profissional',
-    type: 'App'
-  },
-  {
-    id: 3,
-    title: 'Radar de Inovação 2026',
-    url: 'https://senaigoias.com.br/',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=400',
-    categoryId: 'sti',
-    type: 'Infográfico'
-  },
-  {
-    id: 4,
-    title: 'Apresentação de Resultados Q1',
-    url: 'https://senaigoias.com.br/institucional',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=400',
-    categoryId: 'institucional',
-    type: 'Apresentação'
-  },
-  {
-    id: 5,
-    title: 'Dashboard de Metas Estratégicas',
-    url: 'https://senaigoias.com.br/estrategia',
-    image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400',
-    categoryId: 'estrategicos',
-    type: 'Dashboard'
-  }
-];
-
-// --- COMPONENTE DE MODAL SEPARADO (Isolado para funcionar de forma estática no GitHub Pages) ---
-function ResourceFormModal({ isOpen, onClose, onSave, editingLink, categories }) {
-  const [title, setTitle] = useState('');
-  const [url, setUrl] = useState('');
-  const [category, setCategory] = useState(categories[0].id);
-  const [imagePreview, setImagePreview] = useState(null);
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repositório - SESI SENAI GO</title>
   
-  const fileInputRef = useRef(null);
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- React & ReactDOM (Versão 18) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Babel para transpilar o JSX no navegador -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-  // Efeito para preencher o formulário automaticamente se for uma edição
-  useEffect(() => {
-    if (isOpen) {
-      if (editingLink) {
-        setTitle(editingLink.title);
-        setUrl(editingLink.url);
-        setCategory(editingLink.categoryId);
-        setImagePreview(editingLink.image);
-      } else {
-        setTitle('');
-        setUrl('');
-        setCategory(categories[0].id);
-        setImagePreview(null);
-      }
-    }
-  }, [isOpen, editingLink, categories]);
+  <style>
+    /* Suaviza a rolagem e remove barras indesejadas */
+    html { scroll-behavior: smooth; }
+    body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  </style>
+</head>
+<body class="bg-white text-gray-900 selection:bg-blue-100 selection:text-blue-900">
+  
+  <div id="root"></div>
 
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => setImagePreview(reader.result);
-      reader.readAsDataURL(file);
-    }
-  };
+  <!-- Script principal em Babel/JSX -->
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (!title || !url) return;
+    // --- ÍCONES SVG (Substituindo a biblioteca externa para funcionar num único ficheiro) ---
+    const IconProps = { fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
     
-    onSave({
-      id: editingLink ? editingLink.id : null,
-      title,
-      url,
-      categoryId: category,
-      image: imagePreview
-    });
-  };
+    const Search = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+    );
+    const Plus = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M5 12h14"/><path d="M12 5v14"/></svg>
+    );
+    const ExternalLink = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+    );
+    const BookOpen = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    );
+    const Briefcase = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+    );
+    const Lightbulb = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
+    );
+    const Building2 = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
+    );
+    const Target = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    );
+    const X = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+    );
+    const UploadCloud = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
+    );
+    const ImageIcon = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
+    );
+    const Edit2 = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
+    );
+    const Trash2 = ({ className }) => (
+      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
+    );
 
-  if (!isOpen) return null;
+    // --- DADOS INICIAIS ---
+    const CATEGORIES = [
+      { id: 'ed-basica', name: 'Educação Básica', icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
+      { id: 'ed-profissional', name: 'Educação Profissional', icon: Briefcase, color: 'text-red-600', bg: 'bg-red-50' },
+      { id: 'sti', name: 'Serviços de Tecnologia e Inovação', icon: Lightbulb, color: 'text-amber-500', bg: 'bg-amber-50' },
+      { id: 'institucional', name: 'Institucional', icon: Building2, color: 'text-slate-700', bg: 'bg-slate-100' },
+      { id: 'estrategicos', name: 'Estratégicos', icon: Target, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    ];
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-      <div 
-        className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden transform scale-100 animate-in fade-in zoom-in-95 duration-200"
-        style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}
-      >
-        <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-          <h3 className="text-xl font-black tracking-tight">
-            {editingLink ? 'Editar Recurso' : 'Cadastrar Novo Recurso'}
-          </h3>
-          <button 
-            onClick={onClose}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-red-100 hover:text-red-600 transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
+    const INITIAL_LINKS = [
+      {
+        id: 1,
+        title: 'Agente IA - Tutor de Matemática',
+        url: 'https://www.sesi.org.br',
+        image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=400',
+        categoryId: 'ed-basica',
+        type: 'Assistente'
+      },
+      {
+        id: 2,
+        title: 'Simulador de Indústria 4.0',
+        url: 'https://www.portaldaindustria.com.br/senai/',
+        image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400',
+        categoryId: 'ed-profissional',
+        type: 'App'
+      },
+      {
+        id: 3,
+        title: 'Radar de Inovação 2026',
+        url: 'https://senaigoias.com.br/',
+        image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=400',
+        categoryId: 'sti',
+        type: 'Infográfico'
+      },
+      {
+        id: 4,
+        title: 'Apresentação de Resultados Q1',
+        url: 'https://senaigoias.com.br/institucional',
+        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=400',
+        categoryId: 'institucional',
+        type: 'Apresentação'
+      },
+      {
+        id: 5,
+        title: 'Dashboard de Metas Estratégicas',
+        url: 'https://senaigoias.com.br/estrategia',
+        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400',
+        categoryId: 'estrategicos',
+        type: 'Dashboard'
+      }
+    ];
+
+    // --- COMPONENTE DO MODAL DE CADASTRO ---
+    function ResourceFormModal({ isOpen, onClose, onSave, editingLink, categories }) {
+      const [title, setTitle] = useState('');
+      const [url, setUrl] = useState('');
+      const [category, setCategory] = useState(categories[0].id);
+      const [imagePreview, setImagePreview] = useState(null);
+      
+      const fileInputRef = useRef(null);
+
+      useEffect(() => {
+        if (isOpen) {
+          if (editingLink) {
+            setTitle(editingLink.title);
+            setUrl(editingLink.url);
+            setCategory(editingLink.categoryId);
+            setImagePreview(editingLink.image);
+          } else {
+            setTitle('');
+            setUrl('');
+            setCategory(categories[0].id);
+            setImagePreview(null);
+          }
+        }
+      }, [isOpen, editingLink, categories]);
+
+      const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onloadend = () => setImagePreview(reader.result);
+          reader.readAsDataURL(file);
+        }
+      };
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (!title || !url) return;
+        
+        onSave({
+          id: editingLink ? editingLink.id : null,
+          title,
+          url,
+          categoryId: category,
+          image: imagePreview
+        });
+      };
+
+      if (!isOpen) return null;
+
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
+          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden transform scale-100 animate-in fade-in zoom-in-95 duration-200">
+            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+              <h3 className="text-xl font-black tracking-tight">
+                {editingLink ? 'Editar Recurso' : 'Cadastrar Novo Recurso'}
+              </h3>
+              <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-red-100 hover:text-red-600 transition-colors">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Imagem de Capa</label>
+                <div 
+                  onClick={() => fileInputRef.current?.click()}
+                  className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
+                    imagePreview ? 'border-transparent p-0 overflow-hidden relative h-48' : 'border-gray-300 hover:border-black hover:bg-gray-50'
+                  }`}
+                >
+                  {imagePreview ? (
+                    <React.Fragment>
+                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
+                        <p className="text-white font-bold flex items-center gap-2">
+                          <ImageIcon className="w-5 h-5" /> Trocar Imagem
+                        </p>
+                      </div>
+                    </React.Fragment>
+                  ) : (
+                    <div className="flex flex-col items-center">
+                      <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-3">
+                        <UploadCloud className="w-6 h-6" />
+                      </div>
+                      <p className="font-bold text-sm text-gray-900">Clique para selecionar uma imagem</p>
+                      <p className="text-xs text-gray-500 mt-1 font-medium">PNG, JPG ou WEBP (Max. 2MB)</p>
+                    </div>
+                  )}
+                  <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Título do Recurso</label>
+                <input 
+                  type="text" required placeholder="Ex: Agente IA - Processos RH"
+                  className="w-full bg-gray-50 border-2 border-gray-200 focus:border-black rounded-xl px-4 py-3 outline-none transition-colors font-medium"
+                  value={title} onChange={(e) => setTitle(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">URL de Acesso</label>
+                <input 
+                  type="url" required placeholder="https://..."
+                  className="w-full bg-gray-50 border-2 border-gray-200 focus:border-black rounded-xl px-4 py-3 outline-none transition-colors font-medium"
+                  value={url} onChange={(e) => setUrl(e.target.value)}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Área Estratégica</label>
+                <select 
+                  className="w-full bg-gray-50 border-2 border-gray-200 focus:border-black rounded-xl px-4 py-3 outline-none transition-colors font-bold text-gray-700 appearance-none cursor-pointer"
+                  value={category} onChange={(e) => setCategory(e.target.value)}
+                >
+                  {categories.map(cat => (
+                    <option key={cat.id} value={cat.id}>{cat.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="pt-4">
+                <button type="submit" className="w-full bg-black text-white text-lg font-bold py-4 rounded-xl hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-600/30 active:scale-[0.98]">
+                  {editingLink ? 'Salvar Alterações' : 'Adicionar ao Repositório'}
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
+      );
+    }
 
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          
-          {/* UPLOAD DE IMAGEM */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Imagem de Capa</label>
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
-                imagePreview 
-                ? 'border-transparent p-0 overflow-hidden relative h-48' 
-                : 'border-gray-300 hover:border-black hover:bg-gray-50'
-              }`}
-            >
-              {imagePreview ? (
-                <>
-                  <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                  <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                    <p className="text-white font-bold flex items-center gap-2">
-                      <ImageIcon className="w-5 h-5" /> Trocar Imagem
-                    </p>
-                  </div>
-                </>
-              ) : (
-                <div className="flex flex-col items-center">
-                  <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-3">
-                    <UploadCloud className="w-6 h-6" />
-                  </div>
-                  <p className="font-bold text-sm text-gray-900">Clique para selecionar uma imagem</p>
-                  <p className="text-xs text-gray-500 mt-1 font-medium">PNG, JPG ou WEBP (Max. 2MB)</p>
+    // --- COMPONENTE PRINCIPAL (APP) ---
+    function App() {
+      // Modificação: Agora os links são lidos da memória do navegador primeiro.
+      // Se não existir nada salvo, ele carrega os INITIAL_LINKS.
+      const [links, setLinks] = useState(() => {
+        const savedLinks = localStorage.getItem('@SesiSenaiRepositorio:links');
+        if (savedLinks) {
+          return JSON.parse(savedLinks);
+        }
+        return INITIAL_LINKS;
+      });
+      
+      const [search, setSearch] = useState('');
+      const [isModalOpen, setIsModalOpen] = useState(false);
+      const [editingLink, setEditingLink] = useState(null);
+
+      // Modificação: Toda vez que o estado 'links' mudar (adicionar, editar ou excluir),
+      // salvamos automaticamente na memória do navegador.
+      useEffect(() => {
+        localStorage.setItem('@SesiSenaiRepositorio:links', JSON.stringify(links));
+      }, [links]);
+
+      const handleOpenNew = () => {
+        setEditingLink(null);
+        setIsModalOpen(true);
+      };
+
+      const handleEdit = (link) => {
+        setEditingLink(link);
+        setIsModalOpen(true);
+      };
+
+      const handleDelete = (id) => {
+        if (window.confirm('Tem a certeza que deseja excluir este recurso?')) {
+          setLinks(links.filter(link => link.id !== id));
+        }
+      };
+
+      const handleSaveResource = (resourceData) => {
+        if (resourceData.id) {
+          setLinks(links.map(link => link.id === resourceData.id ? {
+            ...link,
+            title: resourceData.title,
+            url: resourceData.url,
+            categoryId: resourceData.categoryId,
+            image: resourceData.image || link.image
+          } : link));
+        } else {
+          const newLinkItem = {
+            id: Date.now(),
+            title: resourceData.title,
+            url: resourceData.url,
+            image: resourceData.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=400',
+            categoryId: resourceData.categoryId,
+            type: 'Novo Recurso'
+          };
+          setLinks([newLinkItem, ...links]);
+        }
+        setIsModalOpen(false);
+      };
+
+      const filteredLinks = links.filter(link => 
+        link.title.toLowerCase().includes(search.toLowerCase())
+      );
+
+      return (
+        <div className="min-h-screen">
+          <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-gray-100">
+            <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div>
+                  <h1 className="text-xl font-black tracking-tight leading-none">SESI SENAI GO</h1>
+                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-1">Dir. Educação e Tecnologia</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 w-full md:w-auto">
+                <div className="relative w-full md:w-80 group">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-600 transition-colors" />
+                  <input 
+                    type="text" 
+                    placeholder="Buscar soluções, IA, painéis..." 
+                    className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-sm rounded-full py-2.5 pl-10 pr-4 outline-none transition-all font-medium placeholder-gray-400"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                </div>
+                <button 
+                  onClick={handleOpenNew}
+                  className="bg-black text-white px-5 py-2.5 rounded-full font-bold text-sm hover:bg-blue-600 hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2 whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4" />
+                  Novo Link
+                </button>
+                
+                <div className="hidden lg:block w-px h-8 bg-gray-200 mx-1"></div>
+                <img 
+                  src="https://i.postimg.cc/FKcLrf7h/DET-SESI-SENAI.png" 
+                  alt="Logo DET SESI SENAI" 
+                  className="h-10 md:h-12 object-contain ml-2"
+                />
+              </div>
+            </div>
+          </header>
+
+          <main className="max-w-7xl mx-auto px-6 py-12">
+            <div className="mb-12">
+              <h2 className="text-5xl font-black tracking-tighter mb-4 text-black">Ecossistema de Soluções</h2>
+              <p className="text-lg text-gray-500 font-medium max-w-2xl">
+                Explore e acesse nosso repositório inteligente de assistentes de IA, painéis estratégicos e tecnologias educacionais.
+              </p>
+            </div>
+
+            <div className="space-y-16">
+              {CATEGORIES.map(category => {
+                const categoryLinks = filteredLinks.filter(l => l.categoryId === category.id);
+                if (categoryLinks.length === 0) return null;
+
+                const Icon = category.icon;
+
+                return (
+                  <section key={category.id} className="relative">
+                    <div className="absolute top-6 left-0 w-full h-px bg-gray-100 -z-10"></div>
+                    
+                    <div className="flex items-center gap-3 mb-8 bg-white pr-6 inline-flex relative z-0">
+                      <div className={`p-3 rounded-2xl ${category.bg} ${category.color} shadow-sm border border-gray-100/50`}>
+                        <Icon className="w-6 h-6" />
+                      </div>
+                      <h3 className="text-2xl font-bold tracking-tight">{category.name}</h3>
+                      <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2.5 py-1 rounded-full ml-2">
+                        {categoryLinks.length}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                      {categoryLinks.map(link => (
+                        <a 
+                          key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
+                          className="group block bg-white border border-gray-200 rounded-3xl overflow-hidden hover:border-black hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
+                        >
+                          <div className="h-40 w-full overflow-hidden relative">
+                            <img src={link.image} alt={link.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                            
+                            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                              <button 
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEdit(link); }}
+                                className="bg-white/90 hover:bg-white p-2 rounded-full text-gray-700 hover:text-blue-600 shadow-sm backdrop-blur transition-colors"
+                                title="Editar"
+                              >
+                                <Edit2 className="w-3.5 h-3.5" />
+                              </button>
+                              <button 
+                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(link.id); }}
+                                className="bg-white/90 hover:bg-white p-2 rounded-full text-gray-700 hover:text-red-600 shadow-sm backdrop-blur transition-colors"
+                                title="Excluir"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+
+                            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur text-xs font-bold px-2.5 py-1 rounded-full text-black shadow-sm">
+                              {link.type}
+                            </div>
+                          </div>
+                          <div className="p-5">
+                            <h4 className="font-bold text-lg leading-tight mb-2 group-hover:text-blue-600 transition-colors">
+                              {link.title}
+                            </h4>
+                            <div className="flex items-center justify-between mt-4">
+                              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
+                                Acessar <ExternalLink className="w-3 h-3" />
+                              </span>
+                              <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 group-hover:${category.bg} transition-colors`}>
+                                <Icon className={`w-4 h-4 text-gray-400 group-hover:${category.color}`} />
+                              </div>
+                            </div>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </section>
+                );
+              })}
+              
+              {filteredLinks.length === 0 && (
+                <div className="text-center py-20 border-2 border-dashed border-gray-200 rounded-3xl">
+                  <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-400">Nenhuma solução encontrada</h3>
+                  <p className="text-gray-400 mt-2">Tente buscar com outros termos ou adicione um novo link.</p>
                 </div>
               )}
-              <input 
-                type="file" 
-                ref={fileInputRef}
-                onChange={handleImageChange}
-                accept="image/*"
-                className="hidden" 
-              />
             </div>
-          </div>
+          </main>
 
-          {/* TÍTULO */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Título do Recurso</label>
-            <input 
-              type="text" 
-              required
-              placeholder="Ex: Agente IA - Processos RH"
-              className="w-full bg-gray-50 border-2 border-gray-200 focus:border-black rounded-xl px-4 py-3 outline-none transition-colors font-medium"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-            />
-          </div>
-
-          {/* LINK */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">URL de Acesso</label>
-            <input 
-              type="url" 
-              required
-              placeholder="https://..."
-              className="w-full bg-gray-50 border-2 border-gray-200 focus:border-black rounded-xl px-4 py-3 outline-none transition-colors font-medium"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-            />
-          </div>
-
-          {/* CATEGORIA */}
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-2">Área Estratégica</label>
-            <select 
-              className="w-full bg-gray-50 border-2 border-gray-200 focus:border-black rounded-xl px-4 py-3 outline-none transition-colors font-bold text-gray-700 appearance-none cursor-pointer"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              {categories.map(cat => (
-                <option key={cat.id} value={cat.id}>{cat.name}</option>
-              ))}
-            </select>
-          </div>
-
-          <div className="pt-4">
-            <button 
-              type="submit"
-              className="w-full bg-black text-white text-lg font-bold py-4 rounded-xl hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-600/30 active:scale-[0.98]"
-            >
-              {editingLink ? 'Salvar Alterações' : 'Adicionar ao Repositório'}
-            </button>
-          </div>
-
-        </form>
-      </div>
-    </div>
-  );
-}
-
-export default function App() {
-  const [links, setLinks] = useState(INITIAL_LINKS);
-  const [search, setSearch] = useState('');
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingLink, setEditingLink] = useState(null);
-
-  // Abrir modal para novo
-  const handleOpenNew = () => {
-    setEditingLink(null);
-    setIsModalOpen(true);
-  };
-
-  // Abrir modal para edição
-  const handleEdit = (link) => {
-    setEditingLink(link);
-    setIsModalOpen(true);
-  };
-
-  // Excluir item
-  const handleDelete = (id) => {
-    if (window.confirm('Tem a certeza que deseja excluir este recurso?')) {
-      setLinks(links.filter(link => link.id !== id));
+          <ResourceFormModal 
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onSave={handleSaveResource}
+            editingLink={editingLink}
+            categories={CATEGORIES}
+          />
+        </div>
+      );
     }
-  };
 
-  // Salvar recurso (seja novo ou editado) através do Modal
-  const handleSaveResource = (resourceData) => {
-    if (resourceData.id) {
-      // Atualiza item existente
-      setLinks(links.map(link => link.id === resourceData.id ? {
-        ...link,
-        title: resourceData.title,
-        url: resourceData.url,
-        categoryId: resourceData.categoryId,
-        image: resourceData.image || link.image
-      } : link));
-    } else {
-      // Cria novo item
-      const newLinkItem = {
-        id: Date.now(),
-        title: resourceData.title,
-        url: resourceData.url,
-        image: resourceData.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=400',
-        categoryId: resourceData.categoryId,
-        type: 'Novo Recurso'
-      };
-      setLinks([newLinkItem, ...links]);
-    }
-    setIsModalOpen(false);
-  };
-
-  // Filtragem
-  const filteredLinks = links.filter(link => 
-    link.title.toLowerCase().includes(search.toLowerCase())
-  );
-
-  return (
-    <div style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }} className="min-h-screen bg-white text-gray-900 selection:bg-blue-100 selection:text-blue-900">
-      
-      {/* HEADER PRINCIPAL */}
-      <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-        <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3">
-            <div>
-              <h1 className="text-xl font-black tracking-tight leading-none">SESI SENAI GO</h1>
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-1">Dir. Educação e Tecnologia</p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-4 w-full md:w-auto">
-            <div className="relative w-full md:w-80 group">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-600 transition-colors" />
-              <input 
-                type="text" 
-                placeholder="Buscar soluções, IA, painéis..." 
-                className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-sm rounded-full py-2.5 pl-10 pr-4 outline-none transition-all font-medium placeholder-gray-400"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
-            </div>
-            <button 
-              onClick={handleOpenNew}
-              className="bg-black text-white px-5 py-2.5 rounded-full font-bold text-sm hover:bg-blue-600 hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2 whitespace-nowrap"
-            >
-              <Plus className="w-4 h-4" />
-              Novo Link
-            </button>
-            
-            {/* Separador e Logo no canto superior direito */}
-            <div className="hidden lg:block w-px h-8 bg-gray-200 mx-1"></div>
-            <img 
-              src="https://i.postimg.cc/FKcLrf7h/DET-SESI-SENAI.png" 
-              alt="Logo DET SESI SENAI" 
-              className="h-10 md:h-12 object-contain ml-2"
-            />
-          </div>
-        </div>
-      </header>
-
-      {/* ÁREA DE CONTEÚDO - INFOGRÁFICO / REPOSITÓRIO */}
-      <main className="max-w-7xl mx-auto px-6 py-12">
-        
-        <div className="mb-12">
-          <h2 className="text-5xl font-black tracking-tighter mb-4 text-black">Ecossistema de Soluções</h2>
-          <p className="text-lg text-gray-500 font-medium max-w-2xl">
-            Explore e acesse nosso repositório inteligente de assistentes de IA, painéis estratégicos e tecnologias educacionais.
-          </p>
-        </div>
-
-        {/* BENTO GRID DE CATEGORIAS */}
-        <div className="space-y-16">
-          {CATEGORIES.map(category => {
-            const categoryLinks = filteredLinks.filter(l => l.categoryId === category.id);
-            if (categoryLinks.length === 0) return null;
-
-            const Icon = category.icon;
-
-            return (
-              <section key={category.id} className="relative">
-                {/* Linha separadora elegante */}
-                <div className="absolute top-6 left-0 w-full h-px bg-gray-100 -z-10"></div>
-                
-                <div className="flex items-center gap-3 mb-8 bg-white pr-6 inline-flex relative z-0">
-                  <div className={`p-3 rounded-2xl ${category.bg} ${category.color} shadow-sm border border-gray-100/50`}>
-                    <Icon className="w-6 h-6" />
-                  </div>
-                  <h3 className="text-2xl font-bold tracking-tight">{category.name}</h3>
-                  <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2.5 py-1 rounded-full ml-2">
-                    {categoryLinks.length}
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                  {categoryLinks.map(link => (
-                    <a 
-                      key={link.id} 
-                      href={link.url} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="group block bg-white border border-gray-200 rounded-3xl overflow-hidden hover:border-black hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
-                    >
-                      <div className="h-40 w-full overflow-hidden relative">
-                        <img 
-                          src={link.image} 
-                          alt={link.title} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        
-                        {/* Botões de Ação */}
-                        <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                          <button 
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEdit(link); }}
-                            className="bg-white/90 hover:bg-white p-2 rounded-full text-gray-700 hover:text-blue-600 shadow-sm backdrop-blur transition-colors"
-                            title="Editar"
-                          >
-                            <Edit2 className="w-3.5 h-3.5" />
-                          </button>
-                          <button 
-                            onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(link.id); }}
-                            className="bg-white/90 hover:bg-white p-2 rounded-full text-gray-700 hover:text-red-600 shadow-sm backdrop-blur transition-colors"
-                            title="Excluir"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
-                        </div>
-
-                        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur text-xs font-bold px-2.5 py-1 rounded-full text-black shadow-sm">
-                          {link.type}
-                        </div>
-                      </div>
-                      <div className="p-5">
-                        <h4 className="font-bold text-lg leading-tight mb-2 group-hover:text-blue-600 transition-colors">
-                          {link.title}
-                        </h4>
-                        <div className="flex items-center justify-between mt-4">
-                          <span className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                            Acessar <ExternalLink className="w-3 h-3" />
-                          </span>
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 group-hover:${category.bg} transition-colors`}>
-                            <Icon className={`w-4 h-4 text-gray-400 group-hover:${category.color}`} />
-                          </div>
-                        </div>
-                      </div>
-                    </a>
-                  ))}
-                </div>
-              </section>
-            );
-          })}
-          
-          {filteredLinks.length === 0 && (
-            <div className="text-center py-20 border-2 border-dashed border-gray-200 rounded-3xl">
-              <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-400">Nenhuma solução encontrada</h3>
-              <p className="text-gray-400 mt-2">Tente buscar com outros termos ou adicione um novo link.</p>
-            </div>
-          )}
-        </div>
-      </main>
-
-      {/* MODAL DE CADASTRO EXTERNALIZADO */}
-      <ResourceFormModal 
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        onSave={handleSaveResource}
-        editingLink={editingLink}
-        categories={CATEGORIES}
-      />
-    </div>
-  );
-}
+    // Inicializa a aplicação React 18 no navegador
+    const rootElement = document.getElementById("root");
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(<App />);
+  </script>
+</body>
+</html>
