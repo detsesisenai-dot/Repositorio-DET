@@ -1,472 +1,1298 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Repositório - SESI SENAI GO</title>
-  
-  <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
-  <!-- React & ReactDOM (Versão 18) -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  
-  <!-- Babel para transpilar o JSX no navegador -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
-  <style>
-    /* Suaviza a rolagem e remove barras indesejadas */
-    html { scroll-behavior: smooth; }
-    body { font-family: "Helvetica Neue", Helvetica, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
-  </style>
-</head>
-<body class="bg-white text-gray-900 selection:bg-blue-100 selection:text-blue-900">
-  
-  <div id="root"></div>
-
-  <!-- Script principal em Babel/JSX -->
-  <script type="text/babel">
-    const { useState, useRef, useEffect } = React;
-
-    // --- ÍCONES SVG (Substituindo a biblioteca externa para funcionar num único ficheiro) ---
-    const IconProps = { fill: "none", stroke: "currentColor", strokeWidth: "2", strokeLinecap: "round", strokeLinejoin: "round" };
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inteligência de Mercado | Juntos pela Indústria - SENAI & SEBRAE</title>
     
-    const Search = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-    );
-    const Plus = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M5 12h14"/><path d="M12 5v14"/></svg>
-    );
-    const ExternalLink = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-    );
-    const BookOpen = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-    );
-    const Briefcase = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><rect width="20" height="14" x="2" y="7" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
-    );
-    const Lightbulb = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1.3.5 2.6 1.5 3.5.8.8 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/></svg>
-    );
-    const Building2 = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"/><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"/><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"/><path d="M10 6h4"/><path d="M10 10h4"/><path d="M10 14h4"/><path d="M10 18h4"/></svg>
-    );
-    const Target = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
-    );
-    const X = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
-    );
-    const UploadCloud = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"/><path d="M12 12v9"/><path d="m16 16-4-4-4 4"/></svg>
-    );
-    const ImageIcon = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><circle cx="9" cy="9" r="2"/><path d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"/></svg>
-    );
-    const Edit2 = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M17 3a2.828 2.828 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></svg>
-    );
-    const Trash2 = ({ className }) => (
-      <svg viewBox="0 0 24 24" className={className} {...IconProps}><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>
-    );
-
-    // --- DADOS INICIAIS ---
-    const CATEGORIES = [
-      { id: 'ed-basica', name: 'Educação Básica', icon: BookOpen, color: 'text-blue-600', bg: 'bg-blue-50' },
-      { id: 'ed-profissional', name: 'Educação Profissional', icon: Briefcase, color: 'text-red-600', bg: 'bg-red-50' },
-      { id: 'sti', name: 'Serviços de Tecnologia e Inovação', icon: Lightbulb, color: 'text-amber-500', bg: 'bg-amber-50' },
-      { id: 'institucional', name: 'Institucional', icon: Building2, color: 'text-slate-700', bg: 'bg-slate-100' },
-      { id: 'estrategicos', name: 'Estratégicos', icon: Target, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-    ];
-
-    const INITIAL_LINKS = [
-      {
-        id: 1,
-        title: 'Agente IA - Tutor de Matemática',
-        url: 'https://www.sesi.org.br',
-        image: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&q=80&w=400',
-        categoryId: 'ed-basica',
-        type: 'Assistente'
-      },
-      {
-        id: 2,
-        title: 'Simulador de Indústria 4.0',
-        url: 'https://www.portaldaindustria.com.br/senai/',
-        image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=400',
-        categoryId: 'ed-profissional',
-        type: 'App'
-      },
-      {
-        id: 3,
-        title: 'Radar de Inovação 2026',
-        url: 'https://senaigoias.com.br/',
-        image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=400',
-        categoryId: 'sti',
-        type: 'Infográfico'
-      },
-      {
-        id: 4,
-        title: 'Apresentação de Resultados Q1',
-        url: 'https://senaigoias.com.br/institucional',
-        image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=400',
-        categoryId: 'institucional',
-        type: 'Apresentação'
-      },
-      {
-        id: 5,
-        title: 'Dashboard de Metas Estratégicas',
-        url: 'https://senaigoias.com.br/estrategia',
-        image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=400',
-        categoryId: 'estrategicos',
-        type: 'Dashboard'
-      }
-    ];
-
-    // --- COMPONENTE DO MODAL DE CADASTRO ---
-    function ResourceFormModal({ isOpen, onClose, onSave, editingLink, categories }) {
-      const [title, setTitle] = useState('');
-      const [url, setUrl] = useState('');
-      const [category, setCategory] = useState(categories[0].id);
-      const [imagePreview, setImagePreview] = useState(null);
-      
-      const fileInputRef = useRef(null);
-
-      useEffect(() => {
-        if (isOpen) {
-          if (editingLink) {
-            setTitle(editingLink.title);
-            setUrl(editingLink.url);
-            setCategory(editingLink.categoryId);
-            setImagePreview(editingLink.image);
-          } else {
-            setTitle('');
-            setUrl('');
-            setCategory(categories[0].id);
-            setImagePreview(null);
-          }
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- html2pdf.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: #f8fafc; 
+            color: #1e293b;
         }
-      }, [isOpen, editingLink, categories]);
-
-      const handleImageChange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onloadend = () => setImagePreview(reader.result);
-          reader.readAsDataURL(file);
+        .card-hover { transition: all 0.3s ease; }
+        .card-hover:hover { transform: translateY(-4px); box-shadow: 0 15px 30px rgba(0,0,0,0.08); }
+        .bg-pattern {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 20px 20px;
         }
-      };
-
-      const handleSubmit = (e) => {
-        e.preventDefault();
-        if (!title || !url) return;
+        .html2pdf__container .no-print { display: none !important; }
+        select, input[type="checkbox"] {
+            cursor: pointer;
+        }
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1em;
+        }
+        .tooltip-text { font-size: 0.8rem; line-height: 1.25rem; }
         
-        onSave({
-          id: editingLink ? editingLink.id : null,
-          title,
-          url,
-          categoryId: category,
-          image: imagePreview
-        });
-      };
+        /* Custom Scrollbar */
+        .search-results::-webkit-scrollbar { width: 8px; }
+        .search-results::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 8px;}
+        .search-results::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 8px; }
+        .search-results::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* Timeline line */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 24px;
+            bottom: -24px;
+            left: 23px;
+            width: 2px;
+            background-color: #e2e8f0;
+            z-index: 0;
+        }
+        .timeline-item:last-child .timeline-line::before { display: none; }
+        
+        /* Trilha Validacao transitions */
+        .trilha-card { transition: all 0.3s ease; }
+        .exclude-from-pdf { display: none !important; } /* Oculta totalmente do PDF */
+        .exclude-visual { opacity: 0.4; filter: grayscale(100%); }
+    </style>
+</head>
+<body class="bg-pattern min-h-screen pb-20">
 
-      if (!isOpen) return null;
-
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm transition-opacity">
-          <div className="bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden transform scale-100 animate-in fade-in zoom-in-95 duration-200">
-            <div className="px-6 py-5 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-              <h3 className="text-xl font-black tracking-tight">
-                {editingLink ? 'Editar Recurso' : 'Cadastrar Novo Recurso'}
-              </h3>
-              <button onClick={onClose} className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-200 hover:bg-red-100 hover:text-red-600 transition-colors">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <form onSubmit={handleSubmit} className="p-6 space-y-6">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Imagem de Capa</label>
-                <div 
-                  onClick={() => fileInputRef.current?.click()}
-                  className={`border-2 border-dashed rounded-2xl p-6 text-center cursor-pointer transition-all ${
-                    imagePreview ? 'border-transparent p-0 overflow-hidden relative h-48' : 'border-gray-300 hover:border-black hover:bg-gray-50'
-                  }`}
-                >
-                  {imagePreview ? (
-                    <React.Fragment>
-                      <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                      <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                        <p className="text-white font-bold flex items-center gap-2">
-                          <ImageIcon className="w-5 h-5" /> Trocar Imagem
-                        </p>
-                      </div>
-                    </React.Fragment>
-                  ) : (
-                    <div className="flex flex-col items-center">
-                      <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-full flex items-center justify-center mb-3">
-                        <UploadCloud className="w-6 h-6" />
-                      </div>
-                      <p className="font-bold text-sm text-gray-900">Clique para selecionar uma imagem</p>
-                      <p className="text-xs text-gray-500 mt-1 font-medium">PNG, JPG ou WEBP (Max. 2MB)</p>
-                    </div>
-                  )}
-                  <input type="file" ref={fileInputRef} onChange={handleImageChange} accept="image/*" className="hidden" />
+    <!-- Navbar -->
+    <header class="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-blue-700 text-white rounded-lg flex items-center justify-center font-bold text-xl tracking-tighter shadow-md">
+                    J+I
                 </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Título do Recurso</label>
-                <input 
-                  type="text" required placeholder="Ex: Agente IA - Processos RH"
-                  className="w-full bg-gray-50 border-2 border-gray-200 focus:border-black rounded-xl px-4 py-3 outline-none transition-colors font-medium"
-                  value={title} onChange={(e) => setTitle(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">URL de Acesso</label>
-                <input 
-                  type="url" required placeholder="https://..."
-                  className="w-full bg-gray-50 border-2 border-gray-200 focus:border-black rounded-xl px-4 py-3 outline-none transition-colors font-medium"
-                  value={url} onChange={(e) => setUrl(e.target.value)}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Área Estratégica</label>
-                <select 
-                  className="w-full bg-gray-50 border-2 border-gray-200 focus:border-black rounded-xl px-4 py-3 outline-none transition-colors font-bold text-gray-700 appearance-none cursor-pointer"
-                  value={category} onChange={(e) => setCategory(e.target.value)}
-                >
-                  {categories.map(cat => (
-                    <option key={cat.id} value={cat.id}>{cat.name}</option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="pt-4">
-                <button type="submit" className="w-full bg-black text-white text-lg font-bold py-4 rounded-xl hover:bg-blue-600 transition-all shadow-lg hover:shadow-blue-600/30 active:scale-[0.98]">
-                  {editingLink ? 'Salvar Alterações' : 'Adicionar ao Repositório'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      );
-    }
-
-    // --- COMPONENTE PRINCIPAL (APP) ---
-    function App() {
-      // Modificação: Agora os links são lidos da memória do navegador primeiro.
-      // Se não existir nada salvo, ele carrega os INITIAL_LINKS.
-      const [links, setLinks] = useState(() => {
-        const savedLinks = localStorage.getItem('@SesiSenaiRepositorio:links');
-        if (savedLinks) {
-          return JSON.parse(savedLinks);
-        }
-        return INITIAL_LINKS;
-      });
-      
-      const [search, setSearch] = useState('');
-      const [isModalOpen, setIsModalOpen] = useState(false);
-      const [editingLink, setEditingLink] = useState(null);
-
-      // Modificação: Toda vez que o estado 'links' mudar (adicionar, editar ou excluir),
-      // salvamos automaticamente na memória do navegador.
-      useEffect(() => {
-        localStorage.setItem('@SesiSenaiRepositorio:links', JSON.stringify(links));
-      }, [links]);
-
-      const handleOpenNew = () => {
-        setEditingLink(null);
-        setIsModalOpen(true);
-      };
-
-      const handleEdit = (link) => {
-        setEditingLink(link);
-        setIsModalOpen(true);
-      };
-
-      const handleDelete = (id) => {
-        if (window.confirm('Tem a certeza que deseja excluir este recurso?')) {
-          setLinks(links.filter(link => link.id !== id));
-        }
-      };
-
-      const handleSaveResource = (resourceData) => {
-        if (resourceData.id) {
-          setLinks(links.map(link => link.id === resourceData.id ? {
-            ...link,
-            title: resourceData.title,
-            url: resourceData.url,
-            categoryId: resourceData.categoryId,
-            image: resourceData.image || link.image
-          } : link));
-        } else {
-          const newLinkItem = {
-            id: Date.now(),
-            title: resourceData.title,
-            url: resourceData.url,
-            image: resourceData.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=400',
-            categoryId: resourceData.categoryId,
-            type: 'Novo Recurso'
-          };
-          setLinks([newLinkItem, ...links]);
-        }
-        setIsModalOpen(false);
-      };
-
-      const filteredLinks = links.filter(link => 
-        link.title.toLowerCase().includes(search.toLowerCase())
-      );
-
-      return (
-        <div className="min-h-screen">
-          <header className="sticky top-0 z-10 bg-white/80 backdrop-blur-xl border-b border-gray-100">
-            <div className="max-w-7xl mx-auto px-6 py-5 flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
                 <div>
-                  <h1 className="text-xl font-black tracking-tight leading-none">SESI SENAI GO</h1>
-                  <p className="text-xs font-semibold text-gray-500 uppercase tracking-widest mt-1">Dir. Educação e Tecnologia</p>
+                    <h1 class="text-xl font-extrabold text-slate-900 leading-tight">Juntos pela Indústria</h1>
+                    <p class="text-xs text-slate-500 font-semibold tracking-wide">SENAI • SEBRAE</p>
                 </div>
-              </div>
-
-              <div className="flex items-center gap-4 w-full md:w-auto">
-                <div className="relative w-full md:w-80 group">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 group-focus-within:text-blue-600 transition-colors" />
-                  <input 
-                    type="text" 
-                    placeholder="Buscar soluções, IA, painéis..." 
-                    className="w-full bg-gray-50 border-2 border-transparent focus:border-blue-600 focus:bg-white text-sm rounded-full py-2.5 pl-10 pr-4 outline-none transition-all font-medium placeholder-gray-400"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                  />
-                </div>
-                <button 
-                  onClick={handleOpenNew}
-                  className="bg-black text-white px-5 py-2.5 rounded-full font-bold text-sm hover:bg-blue-600 hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center gap-2 whitespace-nowrap"
-                >
-                  <Plus className="w-4 h-4" />
-                  Novo Link
+            </div>
+            <div class="flex items-center gap-4">
+                <button onclick="mostrarBI()" class="hidden md:flex items-center gap-2 text-sm font-bold text-slate-700 bg-white hover:bg-slate-50 py-2 px-4 rounded-xl border border-slate-200 shadow-sm transition-all">
+                    <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    Acessar BI de Diagnósticos
                 </button>
-                
-                <div className="hidden lg:block w-px h-8 bg-gray-200 mx-1"></div>
-                <img 
-                  src="https://i.postimg.cc/FKcLrf7h/DET-SESI-SENAI.png" 
-                  alt="Logo DET SESI SENAI" 
-                  className="h-10 md:h-12 object-contain ml-2"
-                />
-              </div>
             </div>
-          </header>
-
-          <main className="max-w-7xl mx-auto px-6 py-12">
-            <div className="mb-12">
-              <h2 className="text-5xl font-black tracking-tighter mb-4 text-black">Ecossistema de Soluções</h2>
-              <p className="text-lg text-gray-500 font-medium max-w-2xl">
-                Explore e acesse nosso repositório inteligente de assistentes de IA, painéis estratégicos e tecnologias educacionais.
-              </p>
-            </div>
-
-            <div className="space-y-16">
-              {CATEGORIES.map(category => {
-                const categoryLinks = filteredLinks.filter(l => l.categoryId === category.id);
-                if (categoryLinks.length === 0) return null;
-
-                const Icon = category.icon;
-
-                return (
-                  <section key={category.id} className="relative">
-                    <div className="absolute top-6 left-0 w-full h-px bg-gray-100 -z-10"></div>
-                    
-                    <div className="flex items-center gap-3 mb-8 bg-white pr-6 inline-flex relative z-0">
-                      <div className={`p-3 rounded-2xl ${category.bg} ${category.color} shadow-sm border border-gray-100/50`}>
-                        <Icon className="w-6 h-6" />
-                      </div>
-                      <h3 className="text-2xl font-bold tracking-tight">{category.name}</h3>
-                      <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2.5 py-1 rounded-full ml-2">
-                        {categoryLinks.length}
-                      </span>
-                    </div>
-
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                      {categoryLinks.map(link => (
-                        <a 
-                          key={link.id} href={link.url} target="_blank" rel="noopener noreferrer"
-                          className="group block bg-white border border-gray-200 rounded-3xl overflow-hidden hover:border-black hover:shadow-2xl hover:-translate-y-1 transition-all duration-300"
-                        >
-                          <div className="h-40 w-full overflow-hidden relative">
-                            <img src={link.image} alt={link.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                            
-                            <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                              <button 
-                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleEdit(link); }}
-                                className="bg-white/90 hover:bg-white p-2 rounded-full text-gray-700 hover:text-blue-600 shadow-sm backdrop-blur transition-colors"
-                                title="Editar"
-                              >
-                                <Edit2 className="w-3.5 h-3.5" />
-                              </button>
-                              <button 
-                                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleDelete(link.id); }}
-                                className="bg-white/90 hover:bg-white p-2 rounded-full text-gray-700 hover:text-red-600 shadow-sm backdrop-blur transition-colors"
-                                title="Excluir"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            </div>
-
-                            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur text-xs font-bold px-2.5 py-1 rounded-full text-black shadow-sm">
-                              {link.type}
-                            </div>
-                          </div>
-                          <div className="p-5">
-                            <h4 className="font-bold text-lg leading-tight mb-2 group-hover:text-blue-600 transition-colors">
-                              {link.title}
-                            </h4>
-                            <div className="flex items-center justify-between mt-4">
-                              <span className="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1">
-                                Acessar <ExternalLink className="w-3 h-3" />
-                              </span>
-                              <div className={`w-8 h-8 rounded-full flex items-center justify-center bg-gray-50 group-hover:${category.bg} transition-colors`}>
-                                <Icon className={`w-4 h-4 text-gray-400 group-hover:${category.color}`} />
-                              </div>
-                            </div>
-                          </div>
-                        </a>
-                      ))}
-                    </div>
-                  </section>
-                );
-              })}
-              
-              {filteredLinks.length === 0 && (
-                <div className="text-center py-20 border-2 border-dashed border-gray-200 rounded-3xl">
-                  <Search className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <h3 className="text-xl font-bold text-gray-400">Nenhuma solução encontrada</h3>
-                  <p className="text-gray-400 mt-2">Tente buscar com outros termos ou adicione um novo link.</p>
-                </div>
-              )}
-            </div>
-          </main>
-
-          <ResourceFormModal 
-            isOpen={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-            onSave={handleSaveResource}
-            editingLink={editingLink}
-            categories={CATEGORIES}
-          />
         </div>
-      );
-    }
+    </header>
 
-    // Inicializa a aplicação React 18 no navegador
-    const rootElement = document.getElementById("root");
-    const root = ReactDOM.createRoot(rootElement);
-    root.render(<App />);
-  </script>
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 mt-10" id="conteudo-principal">
+        
+        <!-- Cabeçalho Principal -->
+        <div class="text-center mb-12 max-w-3xl mx-auto" id="main-header">
+            <h2 class="text-4xl md:text-5xl font-extrabold text-slate-900 mb-6 tracking-tight">Diagnóstico Consultivo Industrial</h2>
+            <p class="text-lg text-slate-600 leading-relaxed">
+                Avalie a maturidade da indústria com a metodologia SPIN. A ferramenta cruza as dores com a capacidade de investimento da empresa para gerar o <strong>Grau de Recomendação</strong> do portfólio.
+            </p>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- FASE 1: IMPORTAÇÃO DA BASE E BUSCA         -->
+        <!-- ========================================== -->
+        <div id="fase1-area" class="bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 mb-8 animate-fade-in">
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">1. Inteligência de Leads (Base B+P)</h2>
+                    <p class="text-sm text-slate-500 font-medium mt-2 max-w-2xl">
+                        Comece importando a planilha de inteligência oficial (.csv). Este painel revelará quais indústrias já manifestaram interesse prévio nas soluções do portfólio.
+                    </p>
+                </div>
+                
+                <div class="mt-4 md:mt-0 relative w-full md:w-auto">
+                    <input type="file" id="csvFileInput" accept=".csv" class="hidden" onchange="handleFileUpload(event)">
+                    <label for="csvFileInput" class="cursor-pointer bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-xl transition duration-300 flex items-center justify-center gap-2 shadow-lg w-full">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        Importar Planilha (CSV)
+                    </label>
+                </div>
+            </div>
+
+            <!-- Dashboard de Resumo -->
+            <div id="dashboard-area" class="hidden border-t border-slate-100 pt-8 mt-4 animate-fade-in">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <span class="text-3xl font-black text-slate-800" id="dash-total">0</span>
+                        <span class="text-xs font-bold text-slate-500 uppercase tracking-wide mt-1">Total na Base</span>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-100 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <span class="text-3xl font-black text-blue-700" id="dash-ali">0</span>
+                        <span class="text-xs font-bold text-blue-600 uppercase tracking-wide mt-1">Interesse Gestão (ALI)</span>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <span class="text-3xl font-black text-emerald-700" id="dash-lean">0</span>
+                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-wide mt-1">Interesse Lean (B+P)</span>
+                    </div>
+                    <div class="bg-indigo-50 border border-indigo-100 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                        <span class="text-3xl font-black text-indigo-700" id="dash-digital">0</span>
+                        <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide mt-1">Interesse T. Digital</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+                    <div class="xl:col-span-1 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col">
+                        <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Volume de Interesses (Leads)</h4>
+                        <p class="text-[10px] text-center text-slate-400 mb-4">Mapeamento dos serviços mais procurados pela base importada.</p>
+                        <div class="h-48 flex-1">
+                            <canvas id="barChartInteresses"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="xl:col-span-2 bg-slate-50 border border-slate-200 rounded-2xl p-6 flex flex-col">
+                        <h3 class="text-lg font-bold text-slate-800 mb-1 flex items-center gap-2">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path></svg>
+                            Filtro de Prospecção
+                        </h3>
+                        <p class="text-xs text-slate-500 mb-4">Busque uma empresa para carregar seu perfil e iniciar o diagnóstico SPIN.</p>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4 mt-2">
+                            <div class="relative sm:col-span-2">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                                </div>
+                                <input type="text" id="filterNome" oninput="applyFilters()" placeholder="Buscar por Razão Social ou CNPJ..." class="w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg bg-white text-slate-800 focus:ring-2 focus:ring-blue-600 outline-none text-sm font-medium">
+                            </div>
+                            
+                            <select id="filterInteresse" onchange="applyFilters()" class="w-full p-2 border border-slate-300 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-blue-600 outline-none text-sm">
+                                <option value="">Todos os Interesses (Base Completa)</option>
+                                <option value="ali">Filtro: Gestão e Inovação (ALI)</option>
+                                <option value="lean">Filtro: Manufatura Enxuta (B+P)</option>
+                                <option value="ee">Filtro: Eficiência Energética</option>
+                                <option value="digital">Filtro: Transformação Digital</option>
+                            </select>
+
+                            <select id="filterSegmento" onchange="applyFilters()" class="w-full p-2 border border-slate-300 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-blue-600 outline-none text-sm truncate">
+                                <option value="">Todos os Segmentos</option>
+                            </select>
+
+                            <select id="filterPorte" onchange="applyFilters()" class="w-full p-2 border border-slate-300 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-blue-600 outline-none text-sm sm:col-span-2">
+                                <option value="">Todos os Portes</option>
+                            </select>
+                        </div>
+
+                        <div class="flex-1 bg-white border border-slate-200 rounded-xl overflow-hidden flex flex-col">
+                            <div class="bg-slate-100 px-4 py-2 border-b border-slate-200 text-xs font-bold text-slate-500 uppercase tracking-wide flex justify-between items-center">
+                                <span>Indústrias Filtradas</span>
+                                <span id="countResults" class="bg-slate-200 text-slate-700 py-0.5 px-2 rounded-full">0</span>
+                            </div>
+                            <div id="searchResultsContainer" class="flex-1 max-h-60 overflow-y-auto search-results p-2 space-y-1">
+                                <!-- Cards injetados via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- FASE 2: FORMULÁRIO DE DIAGNÓSTICO (SPIN)   -->
+        <!-- ========================================== -->
+        <div id="diagnostic-area" class="hidden animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="voltarParaBusca()" class="text-sm font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    Voltar para Busca
+                </button>
+            </div>
+
+            <div class="bg-white p-8 md:p-10 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 mb-12 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-blue-50 rounded-full blur-3xl -mr-20 -mt-20 z-0"></div>
+                
+                <div class="relative z-10 mb-8 border-b border-slate-200 pb-6">
+                    <h2 class="text-2xl font-extrabold text-slate-900 tracking-tight">2. Aplicação do Diagnóstico (SPIN)</h2>
+                    <p class="text-sm text-slate-500 font-medium mt-2">
+                        Preencha o formulário conduzindo uma entrevista com o cliente. O sistema calculará a trilha ideal.
+                    </p>
+                </div>
+
+                <form id="diagForm" class="relative z-10 space-y-12">
+                    
+                    <!-- Seção de Identificação Carregada -->
+                    <div class="bg-slate-900 rounded-2xl p-6 text-white shadow-lg border border-slate-800">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                            <div>
+                                <div class="flex items-center gap-3 mb-1">
+                                    <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">Perfil Base Carregado</span>
+                                    <span class="text-slate-400 text-sm font-medium" id="display-cnpj">00.000.000/0000-00</span>
+                                </div>
+                                <h2 class="text-2xl font-black tracking-tight" id="display-razao">Razão Social da Empresa</h2>
+                                <div class="flex flex-wrap gap-4 mt-3 text-sm text-slate-300 font-medium">
+                                    <div class="flex items-center gap-1"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg> <span id="display-setor">Setor</span></div>
+                                    <div class="flex items-center gap-1"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path></svg> <span id="display-porte">Porte</span></div>
+                                    <div class="flex items-center gap-1"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg> <span id="display-colab">Colaboradores</span></div>
+                                </div>
+                            </div>
+                            <div class="flex flex-wrap gap-2">
+                                <div id="badge-ali" class="hidden bg-slate-800 border border-slate-700 px-3 py-1 rounded text-[10px] font-bold text-blue-400 uppercase tracking-widest">⚡ Lead: Gestão</div>
+                                <div id="badge-lean" class="hidden bg-slate-800 border border-slate-700 px-3 py-1 rounded text-[10px] font-bold text-emerald-400 uppercase tracking-widest">⚡ Lead: Lean</div>
+                                <div id="badge-ee" class="hidden bg-slate-800 border border-slate-700 px-3 py-1 rounded text-[10px] font-bold text-amber-400 uppercase tracking-widest">⚡ Lead: Energia</div>
+                                <div id="badge-digital" class="hidden bg-slate-800 border border-slate-700 px-3 py-1 rounded text-[10px] font-bold text-indigo-400 uppercase tracking-widest">⚡ Lead: Digital</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campos de Contexto Operacional -->
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-blue-700 mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2"></path></svg>
+                            Condições de Engajamento e Histórico
+                        </h3>
+                        <p class="text-sm text-slate-500 mb-6">Identifique quem é o responsável pela visita e se a empresa possui histórico financeiro com a aliança.</p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div class="lg:col-span-2">
+                                <label class="block text-sm font-semibold text-slate-800 mb-2">Consultor Responsável</label>
+                                <div class="flex gap-2">
+                                    <select id="consultor" class="w-32 p-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 focus:ring-2 focus:ring-blue-600 outline-none cursor-pointer font-medium text-sm">
+                                        <option value="SENAI">SENAI</option>
+                                        <option value="SEBRAE">SEBRAE</option>
+                                    </select>
+                                    <input type="text" id="nome_consultor" placeholder="Seu Nome Completo..." class="flex-1 p-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 focus:ring-2 focus:ring-blue-600 outline-none font-medium text-sm">
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-800 mb-2">Status do Cliente</label>
+                                <select id="atendimento_anterior" class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 focus:ring-2 focus:ring-blue-600 outline-none cursor-pointer font-medium text-sm">
+                                    <option value="nao">1º Atendimento (Inédito)</option>
+                                    <option value="sim">Indústria Já Atendida</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-800 mb-2">Histórico Financeiro?</label>
+                                <select id="contrapartida" class="w-full p-3 border border-slate-200 rounded-xl bg-slate-50 text-slate-800 focus:ring-2 focus:ring-blue-600 outline-none cursor-pointer font-medium text-sm">
+                                    <option value="nao_aplica">Sem histórico (Inédito)</option>
+                                    <option value="sim">Sim, investiu/pagou antes</option>
+                                    <option value="nao">Não, só usou 100% gratuito</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr class="border-slate-100">
+
+                    <!-- Mapeamento de Dores (SPIN) -->
+                    <div>
+                        <h3 class="text-sm font-bold uppercase tracking-widest text-blue-700 mb-2 flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                            Mapeamento de Dores (SPIN Selling)
+                        </h3>
+                        <p class="text-sm text-slate-500 mb-8">Guie a conversa pelos 4 eixos estruturais da indústria. Utilize as notas orientativas (em cinza) para calibrar com exatidão a opção escolhida.</p>
+                        
+                        <!-- EIXO 1: GESTÃO -->
+                        <div class="mb-10 p-6 bg-slate-50 border border-slate-100 rounded-2xl">
+                            <h4 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-slate-800"></span> Eixo 1: Gestão Estratégica e Finanças
+                            </h4>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">1. Como você avalia o controle do fluxo de caixa e o capital de giro?</label>
+                                    <select id="q_g1" class="w-full p-3 border border-slate-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-slate-500 outline-none cursor-pointer">
+                                        <option value="30">Frágil: Sem controle diário, vivemos de limites de crédito para girar a operação.</option>
+                                        <option value="60">Razoável: Controle básico, mas não extraímos DRE ou análises de rentabilidade profunda.</option>
+                                        <option value="100">Excelente: Caixa saudável, DRE mensal projetada e ferramentas de gestão consolidadas.</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">2. A indústria possui metodologia para precificação e rateio de custos?</label>
+                                    <select id="q_g2" class="w-full p-3 border border-slate-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-slate-500 outline-none cursor-pointer">
+                                        <option value="30">Crítico: Preço baseado apenas no mercado/concorrente. Desconhecemos a margem exata.</option>
+                                        <option value="60">Moderado: Calculamos matéria-prima, mas o rateio do custo fixo e margem de contribuição falham.</option>
+                                        <option value="100">Avançado: Ficha técnica estruturada, markup definido e lucratividade conhecida por item.</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">3. Como a empresa projeta metas e planejamento estratégico?</label>
+                                    <select id="q_g3" class="w-full p-3 border border-slate-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-slate-500 outline-none cursor-pointer">
+                                        <option value="30">Ausente: Liderança atua só no operacional ("apaga incêndios"). Nenhuma meta escrita.</option>
+                                        <option value="60">Básico: Existem metas comerciais, mas o chão de fábrica não tem indicadores desdobrados.</option>
+                                        <option value="100">Estratégico: OKRs e metas geridas, com acompanhamento mensal de toda a operação.</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- EIXO 2: PROCESSOS E MANUFATURA -->
+                        <div class="mb-10 p-6 bg-emerald-50/40 border border-emerald-100 rounded-2xl">
+                            <h4 class="text-lg font-bold text-emerald-800 mb-6 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-emerald-500"></span> Eixo 2: Processos e Produtividade (Lean)
+                            </h4>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">4. Como é a incidência de gargalos ou paradas na produção?</label>
+                                    <select id="q_p1" class="w-full p-3 border border-emerald-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer">
+                                        <option value="30">Crítico: Gargalos geram pilhas de estoque intermediário, ociosidade e atrasos contínuos.</option>
+                                        <option value="60">Moderado: A linha flui, mas não sabemos o takt time e o setup de máquinas é demorado.</option>
+                                        <option value="100">Eficiente: Fluxo contínuo/puxado, setups otimizados (SMED) e sem perdas ocultas.</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">5. Existe cultura de 5S e Procedimentos Operacionais Padrão (POP)?</label>
+                                    <select id="q_p2" class="w-full p-3 border border-emerald-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer">
+                                        <option value="30">Baixo: Bagunça visual. Perde-se muito tempo procurando ferramentas ou materiais.</option>
+                                        <option value="60">Médio: Os processos existem, mas falta disciplina para manter a organização (5S não enraizado).</option>
+                                        <option value="100">Alto: Chão de fábrica autogerido, quadros de sombra, limpeza rotineira e excelência Lean.</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">6. O layout da fábrica gera excesso de movimentação?</label>
+                                    <select id="q_p3" class="w-full p-3 border border-emerald-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-emerald-500 outline-none cursor-pointer">
+                                        <option value="30">Sim, muito: Materiais e pessoas cruzam a fábrica várias vezes durante um único lote (espaguete).</option>
+                                        <option value="60">Parcialmente: Disposição antiga (por ilhas), o que força algum transporte interno desnecessário.</option>
+                                        <option value="100">Não: Layout celular em U ou linha otimizada para o mínimo de deslocamento possível.</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- EIXO 3: ENERGIA E SUSTENTABILIDADE -->
+                        <div class="mb-10 p-6 bg-amber-50/40 border border-amber-100 rounded-2xl">
+                            <h4 class="text-lg font-bold text-amber-800 mb-6 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-amber-500"></span> Eixo 3: Eficiência Energética e Sustentabilidade
+                            </h4>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">7. Qual o impacto do custo de energia elétrica nas despesas?</label>
+                                    <select id="q_e1" class="w-full p-3 border border-amber-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-amber-500 outline-none cursor-pointer">
+                                        <option value="30">Pesado: Margens apertadas. Pagamos frequentes multas de demanda ou energia reativa na fatura.</option>
+                                        <option value="60">Considerável: A conta dói, mas nunca fizemos um laudo do perfil energético da planta.</option>
+                                        <option value="100">Controlado: Demanda contratada otimizada, banco de capacitores em dia e sem multas.</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">8. Como é a gestão de motores elétricos e compressores?</label>
+                                    <select id="q_e2" class="w-full p-3 border border-amber-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-amber-500 outline-none cursor-pointer">
+                                        <option value="30">Corretiva: Motores são rebobinados repetidas vezes. A linha de ar-comprimido chia com vazamentos.</option>
+                                        <option value="60">Preventiva: Manutenção mecânica básica, mas ignoramos perdas térmicas/elétricas ocultas.</option>
+                                        <option value="100">Preditiva: Termografia, troca focada em motores de alto rendimento e vazamentos zerados.</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">9. Há estratégias de Energia Renovável ou Economia Circular?</label>
+                                    <select id="q_e3" class="w-full p-3 border border-amber-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-amber-500 outline-none cursor-pointer">
+                                        <option value="30">Nenhuma: Consumo 100% da rede comum e pagamos para descartar resíduos no lixo.</option>
+                                        <option value="60">Estudando: Temos coleta seletiva básica e interesse em instalar placa solar ou entrar no mercado livre.</option>
+                                        <option value="100">Aplicado: Energia fotovoltaica / mercado livre operando e resíduo reaproveitado ou vendido.</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- EIXO 4: DIGITALIZAÇÃO -->
+                        <div class="mb-6 p-6 bg-indigo-50/40 border border-indigo-100 rounded-2xl">
+                            <h4 class="text-lg font-bold text-indigo-800 mb-6 flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-indigo-500"></span> Eixo 4: Transformação Digital e Inovação
+                            </h4>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">10. Como os apontamentos de produção e paradas são registrados?</label>
+                                    <select id="q_d1" class="w-full p-3 border border-indigo-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer">
+                                        <option value="30">Analógico: Fichas em papel (prancheta) no chão de fábrica, passíveis de erro e atraso.</option>
+                                        <option value="60">Misto: Aponta no papel e digita no Excel depois. O relatório de eficiência só sai no dia seguinte.</option>
+                                        <option value="100">Digital: Coleta em tempo real via tablets ou totens na máquina. Gestão à vista.</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">11. Os equipamentos possuem sensores (IoT) gerando indicadores como OEE automaticamente?</label>
+                                    <select id="q_d2" class="w-full p-3 border border-indigo-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer">
+                                        <option value="30">Não: Operação 100% humana. Se a máquina parar, a TI/Gestão não fica sabendo na hora.</option>
+                                        <option value="60">Em Partes: As máquinas possuem painel próprio, mas não enviam dados para um software central.</option>
+                                        <option value="100">Sim: Planta Smart Factory. Painéis/Dashboards mostram performance OEE minuto a minuto.</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-900 mb-2">12. A empresa investe em Pesquisa, Desenvolvimento e submete projetos (Editais)?</label>
+                                    <select id="q_d3" class="w-full p-3 border border-indigo-200 rounded-lg bg-white text-slate-700 focus:ring-2 focus:ring-indigo-500 outline-none cursor-pointer">
+                                        <option value="30">Ausente: Copiamos o mercado. Não sabemos como estruturar ou captar fundos de inovação.</option>
+                                        <option value="60">Interesse: Queremos inovar produtos/processos, mas falta expertise para escrever projetos robustos.</option>
+                                        <option value="100">Ativo: Área de P&D atuante, captando recursos de fomento e lançando inovações rotineiramente.</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botão de Ação -->
+                    <div class="pt-6 border-t border-slate-200">
+                        <button type="button" onclick="gerarDiagnostico()" class="w-full bg-blue-700 hover:bg-blue-800 text-white text-lg font-bold py-6 rounded-2xl transition-all duration-300 shadow-[0_10px_20px_rgba(29,78,216,0.3)] hover:shadow-[0_15px_25px_rgba(29,78,216,0.4)] flex justify-center items-center gap-3">
+                            Gerar Trilha Estratégica de Adoção
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- FASE 3: RESULTADOS E TRILHA (PDF)          -->
+        <!-- ========================================== -->
+        <div id="resultados-area" class="hidden bg-white p-8 md:p-12 rounded-3xl shadow-[0_20px_50px_rgb(0,0,0,0.08)] border border-slate-100 mb-20 relative animate-fade-in">
+            
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 pb-6 border-b border-slate-200">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">3. Trilha de Adoção e Parecer Técnico</h2>
+                    <p class="text-slate-500 font-medium max-w-2xl" id="subtitulo-relatorio">
+                        Valide ou exclua as recomendações automáticas da plataforma utilizando as caixas de seleção. Avalie o <strong>termômetro de prioridade</strong> de cada serviço para construir sua justificativa final.
+                    </p>
+                </div>
+                <div class="mt-6 md:mt-0 flex gap-3 w-full md:w-auto">
+                    <button onclick="salvarNoBI()" class="no-print flex-1 md:flex-none bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-3 px-6 rounded-xl transition duration-300 flex items-center justify-center gap-2 border border-blue-200">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                        Salvar no BI
+                    </button>
+                    <button onclick="baixarPDF()" class="no-print flex-1 md:flex-none bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 px-6 rounded-xl transition duration-300 flex items-center justify-center gap-2 shadow-lg">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        Exportar PDF
+                    </button>
+                </div>
+            </div>
+            
+            <div id="pdf-content">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    
+                    <!-- Coluna Esquerda: Gráfico e Dados Oficiais -->
+                    <div class="lg:col-span-5 flex flex-col items-center">
+                        <div class="w-full bg-slate-900 text-white rounded-3xl p-6 shadow-lg mb-6 relative overflow-hidden">
+                            <div class="absolute -right-4 -bottom-4 opacity-10">
+                                <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+                            </div>
+                            <h4 class="text-xs font-bold text-blue-400 uppercase tracking-widest mb-4">Laudo da Empresa</h4>
+                            <div class="mb-4">
+                                <p class="text-xl font-black truncate" id="res-razao">Razão Social</p>
+                                <p class="text-sm font-medium text-slate-400" id="res-cnpj">00.000.000/0000-00</p>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4 text-sm mt-4 pt-4 border-t border-slate-700">
+                                <div><span class="block text-slate-500 text-[10px] uppercase font-bold">Porte</span> <span id="res-porte" class="font-medium">-</span></div>
+                                <div><span class="block text-slate-500 text-[10px] uppercase font-bold">Colaboradores</span> <span id="res-colab" class="font-medium">-</span></div>
+                                <div class="col-span-2"><span class="block text-slate-500 text-[10px] uppercase font-bold">Consultor(a) Responsável</span> <span id="res-consultor" class="font-medium">-</span></div>
+                            </div>
+                        </div>
+
+                        <div class="w-full bg-slate-50 rounded-3xl p-6 border border-slate-200 flex flex-col items-center relative">
+                            <div class="absolute top-4 left-4 bg-white px-3 py-1 rounded-full text-xs font-bold text-slate-600 shadow-sm border border-slate-200">Maturidade Geral</div>
+                            <div id="indice_geral" class="text-5xl font-extrabold text-blue-700 mt-6 mb-2">0%</div>
+                            <div class="w-full h-[300px] mt-4 flex items-center justify-center">
+                                <canvas id="radarChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Coluna Direita: A Trilha Dinâmica e Parecer -->
+                    <div class="lg:col-span-7">
+                        <h3 class="text-xl font-extrabold text-slate-800 mb-8 flex items-center gap-2">
+                            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            Plano de Consultorias Recomendado
+                        </h3>
+                        
+                        <div class="relative pl-6" id="trilha-container">
+                            <!-- Itens da trilha injetados via JS -->
+                        </div>
+
+                        <!-- Novo Bloco: Parecer Técnico do Consultor -->
+                        <div class="mt-10 bg-slate-50 p-6 rounded-2xl border border-slate-200 shadow-sm">
+                            <h4 class="text-sm font-bold text-slate-800 mb-4 flex items-center gap-2">
+                                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>
+                                Parecer Técnico e Justificativa
+                            </h4>
+                            
+                            <!-- Resumo Dinâmico da Validação -->
+                            <div id="resumo_validacao_ui" class="mb-4 text-xs font-medium text-slate-600 bg-white p-3 rounded-lg border border-slate-200 no-print">
+                                <!-- Texto inserido via JS -->
+                            </div>
+                            
+                            <textarea id="parecer_consultor" rows="5" class="w-full p-4 border border-slate-300 rounded-xl bg-white text-slate-700 focus:ring-2 focus:ring-blue-600 outline-none text-sm no-print" placeholder="Com base no termômetro de prioridades e nas suas exclusões/validações acima, justifique a proposta desenhada para o cliente..."></textarea>
+                            
+                            <!-- Div visível apenas na impressão/PDF -->
+                            <div id="print_parecer" class="hidden text-sm text-slate-700 whitespace-pre-wrap p-4 bg-white border border-slate-200 rounded-xl"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- Rodapé -->
+                <div class="mt-16 text-center pt-6 border-t border-slate-200 text-xs text-slate-400 font-medium tracking-wide">
+                    Documento gerado via Plataforma Juntos pela Indústria (SENAI & SEBRAE). O parecer técnico e a validação do escopo final são de responsabilidade do consultor signatário, baseando-se no termômetro de urgência analítica.
+                </div>
+            </div>
+        </div>
+
+        <!-- ========================================== -->
+        <!-- FASE 4: BI DE DIAGNÓSTICOS APLICADOS       -->
+        <!-- ========================================== -->
+        <div id="bi-area" class="hidden bg-white p-8 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-200 mb-20 animate-fade-in">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 border-b border-slate-200 pb-6">
+                <div>
+                    <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">4. BI de Diagnósticos Salvos</h2>
+                    <p class="text-sm text-slate-500 font-medium mt-2">
+                        Painel consolidado dos diagnósticos processados na sua sessão. Monitore a maturidade média do funil e edite os atendimentos de forma dinâmica.
+                    </p>
+                </div>
+                <div class="mt-4 md:mt-0 flex gap-3 flex-wrap">
+                    <button onclick="exportarPlanilhaBI()" class="bg-emerald-50 text-emerald-700 hover:bg-emerald-100 font-bold py-2.5 px-5 rounded-xl transition duration-300 border border-emerald-200 flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                        Exportar Planilha CSV
+                    </button>
+                    <button onclick="voltarParaBusca()" class="bg-blue-50 text-blue-700 hover:bg-blue-100 font-bold py-2.5 px-5 rounded-xl transition duration-300 border border-blue-200">
+                        + Iniciar Novo Atendimento
+                    </button>
+                </div>
+            </div>
+
+            <!-- Cards BI -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                    <span class="text-3xl font-black text-slate-800" id="bi-total">0</span>
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-wide mt-1">Diagnósticos Feitos</span>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                    <span class="text-3xl font-black text-blue-700" id="bi-maturidade">0%</span>
+                    <span class="text-xs font-bold text-blue-600 uppercase tracking-wide mt-1">Maturidade Média</span>
+                </div>
+                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                    <span class="text-3xl font-black text-emerald-700" id="bi-lean">0</span>
+                    <span class="text-xs font-bold text-emerald-600 uppercase tracking-wide mt-1">Indicações Lean</span>
+                </div>
+                <div class="bg-indigo-50 border border-indigo-200 rounded-2xl p-4 flex flex-col justify-center items-center text-center">
+                    <span class="text-3xl font-black text-indigo-700" id="bi-digital">0</span>
+                    <span class="text-xs font-bold text-indigo-600 uppercase tracking-wide mt-1">Indicações Digital</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Gráfico BI (Radar Médio) -->
+                <div class="lg:col-span-1 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Maturidade Média do Funil</h4>
+                    <div class="h-56 mt-4">
+                        <canvas id="biMediaChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Gráfico BI (Segmentos) -->
+                <div class="lg:col-span-2 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 text-center">Diagnósticos por Segmento</h4>
+                    <div class="h-56 mt-4 flex items-center justify-center">
+                        <canvas id="biSegmentosChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabela Gerencial -->
+            <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-50 border-b border-slate-200">
+                            <tr>
+                                <th scope="col" class="px-6 py-4">Empresa</th>
+                                <th scope="col" class="px-6 py-4">Segmento</th>
+                                <th scope="col" class="px-6 py-4 text-center">Maturidade</th>
+                                <th scope="col" class="px-6 py-4 text-center">Parecer?</th>
+                                <th scope="col" class="px-6 py-4 text-right">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bi-table-body" class="divide-y divide-slate-100">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- App Logic -->
+    <script>
+        let radarChartInstance = null;
+        let baseEmpresas = []; 
+        let empresaSelecionada = null;
+        
+        // BI e Estado
+        let diagnosticosAplicados = [];
+        let currentEditIndex = -1; 
+
+        // ==========================================
+        // PARSER DO CSV E DASHBOARD INICIAL
+        // ==========================================
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                processData(e.target.result);
+            };
+            reader.readAsText(file);
+        }
+
+        function processData(csvData) {
+            const lines = csvData.split(/\r?\n/);
+            if (lines.length < 2) return;
+
+            baseEmpresas = [];
+            let countAli = 0, countLean = 0, countEE = 0, countDigital = 0;
+            const setoresUnicos = new Set();
+            const portesUnicos = new Set();
+
+            for (let i = 1; i < lines.length; i++) {
+                if (!lines[i].trim()) continue;
+                const currentline = lines[i].split(';');
+                
+                if(currentline.length >= 18) {
+                    const emp = {
+                        ali: currentline[0].trim().toLowerCase() === 'sim',
+                        lean: currentline[1].trim().toLowerCase() === 'sim',
+                        ee: currentline[2].trim().toLowerCase() === 'sim',
+                        digital: currentline[3].trim().toLowerCase() === 'sim',
+                        porte: currentline[5].trim(),
+                        setor: currentline[6].trim(),
+                        cnpj: currentline[8].trim(),
+                        razao: currentline[9].trim(),
+                        funcionariosStr: currentline[17].trim()
+                    };
+                    baseEmpresas.push(emp);
+
+                    if(emp.ali) countAli++;
+                    if(emp.lean) countLean++;
+                    if(emp.ee) countEE++;
+                    if(emp.digital) countDigital++;
+                    
+                    if(emp.setor && emp.setor !== '-') setoresUnicos.add(emp.setor);
+                    if(emp.porte && emp.porte !== '-') portesUnicos.add(emp.porte);
+                }
+            }
+
+            const selSegmento = document.getElementById('filterSegmento');
+            selSegmento.innerHTML = '<option value="">Todos os Segmentos</option>';
+            Array.from(setoresUnicos).sort().forEach(s => { selSegmento.innerHTML += `<option value="${s}">${s}</option>`; });
+
+            const selPorte = document.getElementById('filterPorte');
+            selPorte.innerHTML = '<option value="">Todos os Portes</option>';
+            Array.from(portesUnicos).sort().forEach(p => { selPorte.innerHTML += `<option value="${p}">${p}</option>`; });
+
+            document.getElementById('dash-total').innerText = baseEmpresas.length;
+            document.getElementById('dash-ali').innerText = countAli;
+            document.getElementById('dash-lean').innerText = countLean;
+            document.getElementById('dash-digital').innerText = countDigital;
+
+            renderBarChart(countAli, countLean, countEE, countDigital);
+            document.getElementById('dashboard-area').classList.remove('hidden');
+            applyFilters();
+        }
+
+        let barChartInstance = null;
+        function renderBarChart(ali, lean, ee, digital) {
+            const ctx = document.getElementById('barChartInteresses').getContext('2d');
+            if (barChartInstance) barChartInstance.destroy();
+
+            barChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Gestão (ALI)', 'Lean (B+P)', 'Energia (EE)', 'Digitalização'],
+                    datasets: [{ label: 'Indústrias', data: [ali, lean, ee, digital], backgroundColor: ['#3b82f6', '#10b981', '#f59e0b', '#6366f1'], borderRadius: 6 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { stepSize: 1 } }, x: { grid: { display: false } } } }
+            });
+        }
+
+        function applyFilters() {
+            const txt = document.getElementById('filterNome').value.toLowerCase();
+            const interesse = document.getElementById('filterInteresse').value;
+            const segmento = document.getElementById('filterSegmento').value;
+            const porte = document.getElementById('filterPorte').value;
+
+            const matches = baseEmpresas.filter(emp => {
+                const matchTxt = emp.razao.toLowerCase().includes(txt) || emp.cnpj.includes(txt);
+                let matchInteresse = true;
+                if (interesse === 'ali') matchInteresse = emp.ali;
+                else if (interesse === 'lean') matchInteresse = emp.lean;
+                else if (interesse === 'ee') matchInteresse = emp.ee;
+                else if (interesse === 'digital') matchInteresse = emp.digital;
+
+                const matchSegmento = segmento === '' || emp.setor === segmento;
+                const matchPorte = porte === '' || emp.porte === porte;
+
+                return matchTxt && matchInteresse && matchSegmento && matchPorte;
+            });
+
+            renderSearchResults(matches);
+        }
+
+        function renderSearchResults(matches) {
+            const resultsDiv = document.getElementById('searchResultsContainer');
+            document.getElementById('countResults').innerText = matches.length;
+
+            if (matches.length > 0) {
+                const limitMatches = matches.slice(0, 100);
+                resultsDiv.innerHTML = limitMatches.map(emp => `
+                    <div class="p-3 border border-slate-100 rounded-lg hover:bg-blue-50 cursor-pointer transition-colors group" onclick='selectCompany(${JSON.stringify(emp).replace(/'/g, "&#39;")})'>
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <div class="font-bold text-slate-800 text-sm group-hover:text-blue-700 transition-colors">${emp.razao}</div>
+                                <div class="text-xs text-slate-500 font-medium mt-0.5">${emp.cnpj} • ${emp.porte} • ${emp.setor}</div>
+                            </div>
+                            <div class="flex gap-1 flex-wrap justify-end max-w-[120px]">
+                                ${emp.ali ? '<span class="bg-blue-100 text-blue-700 text-[9px] px-1.5 py-0.5 rounded font-bold">ALI</span>' : ''}
+                                ${emp.lean ? '<span class="bg-emerald-100 text-emerald-700 text-[9px] px-1.5 py-0.5 rounded font-bold">Lean</span>' : ''}
+                                ${emp.ee ? '<span class="bg-amber-100 text-amber-700 text-[9px] px-1.5 py-0.5 rounded font-bold">Energia</span>' : ''}
+                                ${emp.digital ? '<span class="bg-indigo-100 text-indigo-700 text-[9px] px-1.5 py-0.5 rounded font-bold">Digital</span>' : ''}
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+            } else {
+                resultsDiv.innerHTML = `<div class="p-6 text-sm text-slate-500 text-center font-medium">Nenhuma indústria corresponde aos filtros.</div>`;
+            }
+        }
+
+        function voltarParaBusca() {
+            document.getElementById('resultados-area').classList.add('hidden');
+            document.getElementById('diagnostic-area').classList.add('hidden');
+            document.getElementById('bi-area').classList.add('hidden');
+            document.getElementById('fase1-area').classList.remove('hidden');
+            document.getElementById('main-header').classList.remove('hidden');
+            currentEditIndex = -1;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function mostrarBI() {
+            document.getElementById('resultados-area').classList.add('hidden');
+            document.getElementById('diagnostic-area').classList.add('hidden');
+            document.getElementById('fase1-area').classList.add('hidden');
+            document.getElementById('main-header').classList.add('hidden');
+            
+            document.getElementById('bi-area').classList.remove('hidden');
+            renderizarBI();
+        }
+
+        function selectCompany(emp) {
+            empresaSelecionada = emp;
+            currentEditIndex = -1; 
+            
+            // Resets
+            ['q_g1','q_g2','q_g3','q_p1','q_p2','q_p3','q_e1','q_e2','q_e3','q_d1','q_d2','q_d3'].forEach(id => { document.getElementById(id).value = "60"; });
+            document.getElementById('contrapartida').value = "nao_aplica";
+            document.getElementById('atendimento_anterior').value = "nao";
+            document.getElementById('parecer_consultor').value = ""; 
+            
+            preencherIdentificacao(emp);
+
+            document.getElementById('fase1-area').classList.add('hidden');
+            document.getElementById('main-header').classList.add('hidden');
+            const diagArea = document.getElementById('diagnostic-area');
+            diagArea.classList.remove('hidden');
+            setTimeout(() => { diagArea.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+        }
+
+        function preencherIdentificacao(emp) {
+            let porteValue = 'medio';
+            if (emp.porte.toLowerCase().includes('micro')) porteValue = 'me';
+            else if (emp.porte.toLowerCase().includes('pequena')) porteValue = 'epp';
+
+            let segValue = 'outros';
+            const segStr = emp.setor.toLowerCase();
+            if(segStr.includes('alimento') || segStr.includes('bebida') || segStr.includes('cosm')) segValue = 'alimentos';
+            else if(segStr.includes('moda') || segStr.includes('vestu')) segValue = 'moda';
+            else if(segStr.includes('metal')) segValue = 'metalmecanica';
+            else if(segStr.includes('obras') || segStr.includes('constru')) segValue = 'construcao';
+
+            emp.porteCat = porteValue;
+            emp.segCat = segValue;
+
+            document.getElementById('display-razao').innerText = emp.razao;
+            document.getElementById('display-cnpj').innerText = emp.cnpj;
+            document.getElementById('display-setor').innerText = emp.setor;
+            document.getElementById('display-porte').innerText = emp.porte;
+            document.getElementById('display-colab').innerText = emp.funcionariosStr;
+
+            document.getElementById('badge-ali').classList.toggle('hidden', !emp.ali);
+            document.getElementById('badge-lean').classList.toggle('hidden', !emp.lean);
+            document.getElementById('badge-ee').classList.toggle('hidden', !emp.ee);
+            document.getElementById('badge-digital').classList.toggle('hidden', !emp.digital);
+        }
+
+        // ==========================================
+        // MOTOR DE INTELIGÊNCIA E TRILHA
+        // ==========================================
+        let atualG=0, atualP=0, atualE=0, atualD=0, atualIndice=0, atualTrilha=[];
+
+        function gerarDiagnostico() {
+            if(!empresaSelecionada) return;
+
+            const nomeConsultor = document.getElementById('nome_consultor').value || 'Consultor Logado';
+            const consultorEntidade = document.getElementById('consultor').value;
+            const contrapartida = document.getElementById('contrapartida').value;
+            const porteForm = empresaSelecionada.porteCat; 
+            const segmentoForm = empresaSelecionada.segCat;
+            
+            empresaSelecionada.respostasForm = {
+                q_g1: document.getElementById('q_g1').value, q_g2: document.getElementById('q_g2').value, q_g3: document.getElementById('q_g3').value,
+                q_p1: document.getElementById('q_p1').value, q_p2: document.getElementById('q_p2').value, q_p3: document.getElementById('q_p3').value,
+                q_e1: document.getElementById('q_e1').value, q_e2: document.getElementById('q_e2').value, q_e3: document.getElementById('q_e3').value,
+                q_d1: document.getElementById('q_d1').value, q_d2: document.getElementById('q_d2').value, q_d3: document.getElementById('q_d3').value,
+                contrapartida: contrapartida, atendimento: document.getElementById('atendimento_anterior').value, consultor: nomeConsultor, entidade: consultorEntidade
+            };
+
+            const g = Math.round((parseInt(empresaSelecionada.respostasForm.q_g1) + parseInt(empresaSelecionada.respostasForm.q_g2) + parseInt(empresaSelecionada.respostasForm.q_g3)) / 3);
+            const p = Math.round((parseInt(empresaSelecionada.respostasForm.q_p1) + parseInt(empresaSelecionada.respostasForm.q_p2) + parseInt(empresaSelecionada.respostasForm.q_p3)) / 3);
+            const e = Math.round((parseInt(empresaSelecionada.respostasForm.q_e1) + parseInt(empresaSelecionada.respostasForm.q_e2) + parseInt(empresaSelecionada.respostasForm.q_e3)) / 3);
+            const d = Math.round((parseInt(empresaSelecionada.respostasForm.q_d1) + parseInt(empresaSelecionada.respostasForm.q_d2) + parseInt(empresaSelecionada.respostasForm.q_d3)) / 3);
+            
+            atualG = g; atualP = p; atualE = e; atualD = d;
+            atualIndice = Math.round((g + p + e + d) / 4);
+
+            let numFunc = 0;
+            const regexNums = empresaSelecionada.funcionariosStr.match(/\d+/g);
+            if(regexNums && regexNums.length > 0) {
+                numFunc = parseInt(regexNums[0]); 
+                if(empresaSelecionada.funcionariosStr.toLowerCase().includes('mais de 100')) numFunc = 100;
+            }
+
+            const resArea = document.getElementById('resultados-area');
+            resArea.classList.remove('hidden');
+            resArea.classList.add('animate-fade-in');
+            setTimeout(() => { resArea.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 100);
+
+            document.getElementById('res-razao').innerText = empresaSelecionada.razao;
+            document.getElementById('res-cnpj').innerText = empresaSelecionada.cnpj;
+            document.getElementById('res-porte').innerText = empresaSelecionada.porte;
+            document.getElementById('res-colab').innerText = empresaSelecionada.funcionariosStr;
+            document.getElementById('res-consultor').innerText = `${nomeConsultor} (${consultorEntidade})`;
+            document.getElementById('indice_geral').innerText = atualIndice + '%';
+
+            renderizarGraficoRes(g, p, e, d);
+            processarTrilha(empresaSelecionada, porteForm, contrapartida, numFunc, segmentoForm, g, p, e, d);
+        }
+
+        function renderizarGraficoRes(g, p, e, d) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if (radarChartInstance) radarChartInstance.destroy();
+            const chartColor = 'rgba(29, 78, 216, 1)'; const bgColor = 'rgba(29, 78, 216, 0.15)';
+            radarChartInstance = new Chart(ctx, {
+                type: 'radar',
+                data: { labels: ['Gestão', 'Processos', 'Energia', 'Digital'], datasets: [{ data: [g, p, e, d], backgroundColor: bgColor, borderColor: chartColor, pointBackgroundColor: '#ffffff', pointBorderColor: chartColor, borderWidth: 2, tension: 0.3 }] },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { angleLines: { color: 'rgba(0,0,0,0.05)' }, grid: { color: 'rgba(0,0,0,0.05)' }, pointLabels: { font: { family: "'Inter', sans-serif", size: 10, weight: '600' } }, ticks: { display: false, min: 0, max: 100, stepSize: 20 } } } }
+            });
+        }
+
+        function getBadge(tipo) {
+            if (tipo === 'essencial') return `<span class="bg-red-100 text-red-800 border border-red-200 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full inline-flex items-center gap-1"><span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"></span> ⭐ Prioridade Máxima</span>`;
+            if (tipo === 'alta') return `<span class="bg-blue-100 text-blue-800 border border-blue-200 text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full inline-flex items-center gap-1">⚡ Altamente Recomendado</span>`;
+            if (tipo === 'media') return `<span class="bg-slate-100 text-slate-700 border border-slate-200 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full inline-flex items-center gap-1">📈 Oportunidade (Upsell)</span>`;
+            return '';
+        }
+        function tagFin(texto, cor) {
+            const cores = { green: 'bg-emerald-100 text-emerald-800 border-emerald-200', yellow: 'bg-amber-100 text-amber-800 border-amber-200', blue: 'bg-blue-100 text-blue-800 border-blue-200' };
+            return `<span class="border ${cores[cor]} text-[9px] font-bold uppercase px-1.5 py-0.5 rounded inline-block mb-1">${texto}</span> `;
+        }
+
+        const nomesPorte = { 'me': 'Microempresa (ME)', 'epp': 'Empresa de Pequeno Porte (EPP)', 'medio': 'Média/Grande Indústria' };
+
+        function processarTrilha(emp, porte, contrapartida, numFunc, segmentoForm, g, p, e, d) {
+            let trilha = [];
+            const isME_EPP = (porte === 'me' || porte === 'epp');
+            const elegivelBP = numFunc >= 5;
+
+            // 1: GESTÃO
+            let scoreG = (100 - g) + (emp.ali ? 30 : 0);
+            if(scoreG >= 40 || emp.ali) {
+                let texto = tagFin('100% Gratuito', 'green') + 'Gargalos de caixa detectados. O <strong>ALI Produtividade</strong> traz metodologias de gestão modernas. ';
+                if(isME_EPP) texto += 'Atrelado ao programa, o Sebrae habilita o <strong>Conexão Financeira</strong>.';
+                if(emp.ali) texto += '<br><strong class="text-blue-700">✓ Fit Absoluto:</strong> Empresa formalizou interesse na base.';
+                trilha.push({ pilar: 'Gestão Estratégica', titulo: 'ALI Produtividade & Conexão Financeira', desc: texto, entidade: 'SEBRAE', score: scoreG + 10, cor: 'blue', badge: (emp.ali || g <= 40) ? getBadge('essencial') : getBadge('alta'), validado: true });
+            }
+
+            // 2: PROCESSOS
+            let scoreP = (100 - p) + (emp.lean ? 30 : 0);
+            if(scoreP >= 40 || emp.lean) {
+                let texto = '', titulo = '', badgeProcesso = '';
+                if (isME_EPP && elegivelBP) {
+                    titulo = 'Brasil Mais Produtivo (Lean)';
+                    texto = tagFin('100% Gratuito', 'green') + `Diagnóstico aponta gargalos. Como a MPE possui ≥ 5 funcionários, a consultoria de Manufatura Enxuta do <strong>B+P (SENAI)</strong> é subsidiada.`;
+                    badgeProcesso = getBadge('essencial');
+                    if (contrapartida === 'sim') texto += `<br><br>` + tagFin('30% Contrapartida', 'yellow') + `<span class="text-xs text-slate-600 font-medium italic">Empresa possui histórico de contrapartida, o <strong>Programa PIC</strong> deve ser oferecido como upsell para automações.</span>`;
+                } else if (isME_EPP && !elegivelBP) {
+                    titulo = 'Sebraetec Manufatura / PIC';
+                    texto = tagFin('30% Contrapartida', 'yellow') + `Com < 5 colaboradores, recomendamos o <strong>Sebraetec</strong> ou <strong>PIC</strong> do SENAI (30% contrapartida).`;
+                    badgeProcesso = contrapartida === 'nao' ? getBadge('media') : getBadge('alta');
+                } else {
+                    titulo = 'Programa PIC (Impulsione)';
+                    texto = tagFin('30% Contrapartida', 'yellow') + `Para <strong>Média Indústria</strong>, consultorias fabris exigem contrapartida financeira. O <strong>PIC</strong> garante ganhos escaláveis.`;
+                    badgeProcesso = contrapartida === 'nao' ? getBadge('media') : getBadge('alta');
+                }
+                if(emp.lean) texto += '<br><strong class="text-emerald-700">✓ Fit Absoluto:</strong> Requisitou a trilha Lean na base.';
+                trilha.push({ pilar: 'Manufatura e Produção', titulo: titulo, desc: texto, entidade: 'SENAI • SEBRAE', score: scoreP + (elegivelBP && isME_EPP ? 20 : 0), cor: 'emerald', badge: badgeProcesso, validado: true });
+            }
+
+            // 3: ENERGIA
+            let scoreE = (100 - e) + (emp.ee ? 30 : 0);
+            if(scoreE >= 40 || emp.ee) {
+                let texto = tagFin('Avaliação Gratuita', 'green') + `Custos fixos elétricos impactando margem. Inicie com a <strong>Trilha Solar (SEBRAE)</strong> para mapear desperdício. <br><br>`;
+                if(isME_EPP && elegivelBP) texto += tagFin('100% Gratuito', 'green') + `Após isso, conecte na consultoria <strong>B+P Eficiência Energética</strong>.`; 
+                else texto += tagFin('30% Contrapartida', 'yellow') + `Após isso, conecte à fase "Economize" do <strong>Programa PIC</strong> para laudo termográfico.`;
+                if(emp.ee) texto += '<br><strong class="text-amber-700">✓ Fit Absoluto:</strong> Interesse ativo em Eficiência na base.';
+                trilha.push({ pilar: 'Custos Fixos / Energia', titulo: 'Sebrae Energia & Eficiência', desc: texto, entidade: 'SEBRAE • SENAI', score: scoreE, cor: 'amber', badge: (e <= 40 && emp.ee) ? getBadge('essencial') : getBadge('alta'), validado: true });
+            }
+
+            // 4: DIGITALIZAÇÃO
+            let scoreD = (100 - d) + (emp.digital ? 30 : 0);
+            if(scoreD >= 40 || emp.digital) {
+                let texto = 'Déficit na captura de dados. O Programa <strong>Inove+Digital</strong> traz pacotes de digitalização.<br><br>';
+                let badgeD = getBadge('media');
+                if (['alimentos', 'moda', 'metalmecanica', 'construcao'].includes(segmentoForm)) {
+                    if(contrapartida !== 'nao') {
+                        texto += tagFin('15% Subvenção', 'blue') + `🔥 A prioridade é submeter um projeto no <strong>Edital de Inovação SEBRAE/SENAI</strong> (Fomento até R$ 150K).`;
+                        badgeD = getBadge('essencial');
+                    } else {
+                        texto += tagFin('15% Subvenção', 'blue') + `A empresa se enquadra no <strong>Edital de Inovação</strong> (R$ 150 mil), exigindo 15% de contrapartida.`;
+                        badgeD = getBadge('alta');
+                    }
+                }
+                if(emp.digital) texto += '<br><strong class="text-indigo-700">✓ Fit Absoluto:</strong> Requisitou a Transformação Digital na base.';
+                trilha.push({ pilar: 'Transformação Digital', titulo: 'Inove+Digital & Edital', desc: texto, entidade: 'SENAI • SEBRAE', score: scoreD, cor: 'indigo', badge: badgeD, validado: true });
+            }
+
+            // 5: Setoriais
+            if (segmentoForm === 'alimentos') {
+                trilha.push({ pilar: 'Segurança Alimentar', titulo: 'Selo Alimento Confiável', desc: tagFin('Até 70% Subsídio', 'blue') + `Certificação BPF/APPCC. Utilize recursos subsidiados do SEBRAE (Consultoria IST Alimentos).`, entidade: 'SENAI • SEBRAE', score: 90, cor: 'blue', badge: isME_EPP ? getBadge('essencial') : getBadge('alta'), validado: true });
+            } else if (segmentoForm === 'moda') {
+                trilha.push({ pilar: 'Design e Tendência', titulo: 'Sebrae Moda Autoral', desc: `Aceleração estruturada de coleções e acesso vip ao Amarê Fashion.`, entidade: 'SEBRAE', score: 90, cor: 'purple', badge: getBadge('alta'), validado: true });
+            }
+
+            if(trilha.length === 0) {
+                trilha.push({ pilar: 'Expansão', titulo: 'Goiás Original e Move+', desc: 'Foco em VENDAS B2B: <strong>Programa Move+</strong> e <strong>Missões Empresariais</strong>.', entidade: 'SEBRAE', score: 100, cor: 'slate', badge: getBadge('essencial'), validado: true });
+            } else {
+                const uniqueTrilha = Array.from(new Set(trilha.map(a => a.titulo))).map(titulo => trilha.find(a => a.titulo === titulo));
+                uniqueTrilha.sort((a, b) => b.score - a.score);
+                trilha = uniqueTrilha;
+            }
+
+            // Restaura estado de validação caso esteja editando
+            if (currentEditIndex >= 0) {
+                const trilhaSalva = diagnosticosAplicados[currentEditIndex].trilha;
+                trilha.forEach(t => {
+                    const saved = trilhaSalva.find(st => st.titulo === t.titulo);
+                    if(saved && saved.validado === false) t.validado = false;
+                });
+            }
+
+            atualTrilha = trilha; 
+            renderHTMLTrilha(trilha);
+            atualizarResumoValidacao();
+        }
+
+        // Toggle Validation Checkbox
+        function toggleValidacao(idx, checked) {
+            atualTrilha[idx].validado = checked;
+            const card = document.getElementById(`trilha-card-${idx}`);
+            if(checked) {
+                card.classList.remove('exclude-visual', 'exclude-from-pdf');
+            } else {
+                card.classList.add('exclude-visual', 'exclude-from-pdf');
+            }
+            atualizarResumoValidacao();
+        }
+
+        function atualizarResumoValidacao() {
+            const validados = atualTrilha.filter(t => t.validado).length;
+            const excluidos = atualTrilha.filter(t => !t.validado).length;
+            const resumoUI = document.getElementById('resumo_validacao_ui');
+            
+            if(atualTrilha.length > 1) {
+                resumoUI.innerHTML = `<span class="text-blue-600 font-bold">${validados} serviços mantidos</span> na proposta e <span class="text-red-500 font-bold">${excluidos} excluídos</span>. Com base nestes ajustes e no <strong>termômetro de prioridades</strong> de cada card, redija sua justificativa para a empresa.`;
+            } else {
+                resumoUI.innerHTML = `Analise a recomendação gerada e adicione seu parecer técnico orientativo.`;
+            }
+        }
+
+        function renderHTMLTrilha(trilhaArr) {
+            const container = document.getElementById('trilha-container');
+            container.innerHTML = '';
+            const corConfig = {
+                blue: { bg: 'bg-blue-50/50', border: 'border-blue-500', textTitle: 'text-blue-900', iconBg: 'bg-blue-600', fillBar: 'bg-blue-500' },
+                emerald: { bg: 'bg-emerald-50/50', border: 'border-emerald-500', textTitle: 'text-emerald-900', iconBg: 'bg-emerald-600', fillBar: 'bg-emerald-500' },
+                amber: { bg: 'bg-amber-50/50', border: 'border-amber-500', textTitle: 'text-amber-900', iconBg: 'bg-amber-600', fillBar: 'bg-amber-500' },
+                purple: { bg: 'bg-purple-50/50', border: 'border-purple-500', textTitle: 'text-purple-900', iconBg: 'bg-purple-600', fillBar: 'bg-purple-500' },
+                indigo: { bg: 'bg-indigo-50/50', border: 'border-indigo-500', textTitle: 'text-indigo-900', iconBg: 'bg-indigo-600', fillBar: 'bg-indigo-500' },
+                slate: { bg: 'bg-slate-50', border: 'border-slate-800', textTitle: 'text-slate-900', iconBg: 'bg-slate-800', fillBar: 'bg-slate-700' },
+            };
+            
+            trilhaArr.forEach((item, index) => {
+                const conf = corConfig[item.cor];
+                const checkedStr = item.validado ? 'checked' : '';
+                const excClass = item.validado ? '' : 'exclude-visual exclude-from-pdf';
+                const scoreFill = Math.min(item.score, 100);
+
+                const html = `
+                    <div class="relative timeline-item mb-8 trilha-card ${excClass}" id="trilha-card-${index}">
+                        <div class="timeline-line"></div>
+                        <div class="absolute -left-[35px] top-4 w-8 h-8 rounded-full ${conf.iconBg} text-white flex items-center justify-center font-black text-sm shadow-md border-2 border-white z-10">${index + 1}</div>
+                        
+                        <div class="p-6 rounded-2xl border-l-4 ${conf.border} ${conf.bg} card-hover shadow-sm ml-4 flex flex-col">
+                            <div class="flex flex-col sm:flex-row justify-between items-start mb-3 gap-2">
+                                <span class="text-[10px] font-bold uppercase tracking-widest text-slate-500">${item.pilar}</span>
+                                ${item.badge}
+                            </div>
+                            <h4 class="text-xl font-extrabold ${conf.textTitle} mb-1">${item.titulo} <span class="text-[9px] bg-white border border-slate-200 px-2 py-0.5 rounded text-slate-500 ml-2 align-middle uppercase tracking-widest font-bold">${item.entidade}</span></h4>
+                            <p class="text-sm text-slate-700 leading-relaxed font-medium mt-3 mb-5">${item.desc}</p>
+                            
+                            <!-- Termômetro de Prioridade -->
+                            <div class="mt-auto mb-4 bg-white p-3 rounded-lg border border-slate-200/60 shadow-sm">
+                                <div class="flex justify-between text-[9px] font-bold text-slate-500 uppercase tracking-widest mb-1.5">
+                                    <span>Termômetro de Urgência</span>
+                                    <span>Grau de Impacto: ${scoreFill}%</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                                    <div class="h-1.5 rounded-full ${conf.fillBar}" style="width: ${scoreFill}%"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Opt-out system -->
+                            <div class="no-print pt-3 border-t border-slate-200 flex justify-end">
+                                <label class="flex items-center gap-2 cursor-pointer bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-sm hover:bg-slate-50 transition-colors">
+                                    <input type="checkbox" ${checkedStr} class="w-4 h-4 text-blue-600 rounded cursor-pointer" onchange="toggleValidacao(${index}, this.checked)">
+                                    <span class="text-xs font-bold text-slate-700">Validar e Manter no Plano</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>`;
+                container.innerHTML += html;
+            });
+        }
+
+        // ==========================================
+        // SISTEMA DE BI E PDF/CSV
+        // ==========================================
+        function salvarNoBI() {
+            const diagResult = {
+                empresa: empresaSelecionada,
+                g: atualG, p: atualP, e: atualE, d: atualD,
+                indice: atualIndice,
+                trilha: atualTrilha,
+                parecer: document.getElementById('parecer_consultor').value
+            };
+
+            if (currentEditIndex >= 0) {
+                diagnosticosAplicados[currentEditIndex] = diagResult;
+            } else {
+                diagnosticosAplicados.push(diagResult);
+            }
+            
+            mostrarBI();
+        }
+
+        let biMediaChart = null;
+        let biSegChart = null;
+
+        function renderizarBI() {
+            document.getElementById('bi-total').innerText = diagnosticosAplicados.length;
+            
+            if(diagnosticosAplicados.length === 0) {
+                document.getElementById('bi-maturidade').innerText = "0%";
+                document.getElementById('bi-lean').innerText = "0";
+                document.getElementById('bi-digital').innerText = "0";
+                document.getElementById('bi-table-body').innerHTML = `<tr><td colspan="5" class="px-6 py-8 text-center text-slate-500 font-medium">Nenhum diagnóstico salvo nesta sessão.</td></tr>`;
+                
+                if (biMediaChart) biMediaChart.destroy();
+                if (biSegChart) biSegChart.destroy();
+                return;
+            }
+
+            let sumG = 0, sumP = 0, sumE = 0, sumD = 0, sumIndice = 0;
+            let countLean = 0, countDigital = 0;
+            let segCount = {};
+
+            diagnosticosAplicados.forEach(d => {
+                sumG += d.g; sumP += d.p; sumE += d.e; sumD += d.d;
+                sumIndice += d.indice;
+                
+                if(d.trilha.find(t => t.validado && (t.titulo.includes('Lean') || t.titulo.includes('PIC')))) countLean++;
+                if(d.trilha.find(t => t.validado && (t.titulo.includes('Inove') || t.titulo.includes('Edital')))) countDigital++;
+
+                let s = d.empresa.setor;
+                segCount[s] = (segCount[s] || 0) + 1;
+            });
+
+            const len = diagnosticosAplicados.length;
+            document.getElementById('bi-maturidade').innerText = Math.round(sumIndice / len) + "%";
+            document.getElementById('bi-lean').innerText = countLean;
+            document.getElementById('bi-digital').innerText = countDigital;
+
+            const ctxMedia = document.getElementById('biMediaChart').getContext('2d');
+            if (biMediaChart) biMediaChart.destroy();
+            biMediaChart = new Chart(ctxMedia, {
+                type: 'radar',
+                data: {
+                    labels: ['Gestão', 'Processos', 'Energia', 'Digital'],
+                    datasets: [{
+                        data: [sumG/len, sumP/len, sumE/len, sumD/len],
+                        backgroundColor: 'rgba(29, 78, 216, 0.2)', borderColor: 'rgba(29, 78, 216, 1)',
+                        pointBackgroundColor: '#ffffff', pointBorderColor: 'rgba(29, 78, 216, 1)', borderWidth: 2
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { min: 0, max: 100, ticks: {display: false} } } }
+            });
+
+            const ctxSeg = document.getElementById('biSegmentosChart').getContext('2d');
+            if (biSegChart) biSegChart.destroy();
+            const segLabels = Object.keys(segCount);
+            const segData = Object.values(segCount);
+            const bgColors = ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#64748b'];
+
+            biSegChart = new Chart(ctxSeg, {
+                type: 'doughnut',
+                data: {
+                    labels: segLabels.map(l => l.length > 20 ? l.substring(0,18)+'...' : l),
+                    datasets: [{ data: segData, backgroundColor: bgColors, borderWidth: 0 }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { boxWidth: 12, font: {size: 10} } } }, cutout: '70%' }
+            });
+
+            const tbody = document.getElementById('bi-table-body');
+            tbody.innerHTML = '';
+            diagnosticosAplicados.forEach((diag, idx) => {
+                let badgeColor = diag.indice < 50 ? 'bg-red-100 text-red-700' : (diag.indice < 80 ? 'bg-amber-100 text-amber-700' : 'bg-emerald-100 text-emerald-700');
+                let hasParecer = diag.parecer && diag.parecer.trim() !== '' ? '<span class="text-blue-600 font-bold">Sim</span>' : '<span class="text-slate-400">Pendente</span>';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition-colors">
+                        <td class="px-6 py-4 font-bold text-slate-800">${diag.empresa.razao}</td>
+                        <td class="px-6 py-4 text-slate-500 text-xs">${diag.empresa.setor}</td>
+                        <td class="px-6 py-4 text-center"><span class="px-2 py-1 rounded font-bold text-xs ${badgeColor}">${diag.indice}%</span></td>
+                        <td class="px-6 py-4 text-center text-xs">${hasParecer}</td>
+                        <td class="px-6 py-4 text-right">
+                            <button onclick="editarDiagnostico(${idx})" class="text-blue-600 hover:text-blue-900 font-bold text-xs mr-3">Ver/Editar</button>
+                            <button onclick="excluirDiagnostico(${idx})" class="text-red-500 hover:text-red-700 font-bold text-xs">Excluir</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function editarDiagnostico(idx) {
+            currentEditIndex = idx;
+            const diag = diagnosticosAplicados[idx];
+            
+            const ans = diag.empresa.respostasForm;
+            document.getElementById('q_g1').value = ans.q_g1;
+            document.getElementById('q_g2').value = ans.q_g2;
+            document.getElementById('q_g3').value = ans.q_g3;
+            document.getElementById('q_p1').value = ans.q_p1;
+            document.getElementById('q_p2').value = ans.q_p2;
+            document.getElementById('q_p3').value = ans.q_p3;
+            document.getElementById('q_e1').value = ans.q_e1;
+            document.getElementById('q_e2').value = ans.q_e2;
+            document.getElementById('q_e3').value = ans.q_e3;
+            document.getElementById('q_d1').value = ans.q_d1;
+            document.getElementById('q_d2').value = ans.q_d2;
+            document.getElementById('q_d3').value = ans.q_d3;
+            document.getElementById('contrapartida').value = ans.contrapartida;
+            document.getElementById('atendimento_anterior').value = ans.atendimento;
+            document.getElementById('nome_consultor').value = ans.consultor;
+            document.getElementById('consultor').value = ans.entidade;
+            document.getElementById('parecer_consultor').value = diag.parecer || '';
+
+            preencherIdentificacao(diag.empresa);
+
+            document.getElementById('bi-area').classList.add('hidden');
+            const diagArea = document.getElementById('diagnostic-area');
+            diagArea.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function excluirDiagnostico(idx) {
+            if(confirm("Tem certeza que deseja remover este diagnóstico do BI?")) {
+                diagnosticosAplicados.splice(idx, 1);
+                renderizarBI();
+            }
+        }
+
+        function baixarPDF() {
+            const textParecer = document.getElementById('parecer_consultor').value;
+            const divPrintParecer = document.getElementById('print_parecer');
+            const textArea = document.getElementById('parecer_consultor');
+            
+            if (textParecer.trim() !== "") {
+                divPrintParecer.innerText = textParecer;
+                textArea.classList.add('hidden');
+                divPrintParecer.classList.remove('hidden');
+            } else {
+                divPrintParecer.innerText = "Nenhuma justificativa adicional fornecida pelo consultor.";
+                textArea.classList.add('hidden');
+                divPrintParecer.classList.remove('hidden');
+            }
+
+            const element = document.getElementById('pdf-content');
+            const opt = {
+                margin:       [10, 10, 10, 10],
+                filename:     'Trilha_Estrategica_Juntos_Pela_Industria.pdf',
+                image:        { type: 'jpeg', quality: 1.0 },
+                html2canvas:  { scale: 2, useCORS: true, logging: false },
+                jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            };
+
+            html2pdf().set(opt).from(element).save().then(() => {
+                textArea.classList.remove('hidden');
+                divPrintParecer.classList.add('hidden');
+            });
+        }
+
+        // ==========================================
+        // EXPORTAÇÃO CSV DO BI
+        // ==========================================
+        function exportarPlanilhaBI() {
+            if (diagnosticosAplicados.length === 0) {
+                alert("Nenhum diagnóstico registrado nesta sessão para ser exportado.");
+                return;
+            }
+
+            let csvContent = "Empresa;CNPJ;Segmento;Porte;Maturidade;Consultor Responsavel;Entidade;Solucoes Recomendadas;Parecer Tecnico\n";
+
+            diagnosticosAplicados.forEach(diag => {
+                const emp = diag.empresa;
+                
+                const razao = `"${(emp.razao || '').replace(/"/g, '""')}"`;
+                const cnpj = `"${(emp.cnpj || '').replace(/"/g, '""')}"`;
+                const setor = `"${(emp.setor || '').replace(/"/g, '""')}"`;
+                const porte = `"${(emp.porte || '').replace(/"/g, '""')}"`;
+                const maturidade = `"${diag.indice}%"`;
+                
+                const consultor = `"${(emp.respostasForm.consultor || '').replace(/"/g, '""')}"`;
+                const entidade = `"${(emp.respostasForm.entidade || '').replace(/"/g, '""')}"`;
+
+                const recomendados = diag.trilha.filter(t => t.validado !== false).map(t => t.titulo).join(" | ");
+                const strRecomendados = `"${recomendados.replace(/"/g, '""')}"`;
+
+                const parecer = `"${(diag.parecer || '').replace(/"/g, '""').replace(/\n/g, ' - ')}"`;
+
+                csvContent += `${razao};${cnpj};${setor};${porte};${maturidade};${consultor};${entidade};${strRecomendados};${parecer}\n`;
+            });
+
+            const blob = new Blob(["\ufeff" + csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "BI_Diagnosticos_Juntos_Pela_Industria.csv");
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
 </body>
 </html>
